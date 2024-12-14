@@ -39,6 +39,10 @@ export const links = [
         name: "flights",
         icon: <FiShoppingBag />,
       },
+      {
+        name: "flightsTable",
+        icon: <FiShoppingBag />,
+      },
     ],
   },
 
