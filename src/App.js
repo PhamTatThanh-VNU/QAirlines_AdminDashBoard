@@ -4,7 +4,7 @@ import { FiSettings } from "react-icons/fi";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 
 import { Sidebar, ThemeSettings, Navbar, Footer } from "./components";
-import { Location, Login, FlightsTable, Aircraft } from "./pages";
+import { Location, Login, FlightsTable, Aircraft, LoginSide } from "./pages";
 import "./App.css";
 
 import { useStateContext } from "./context/ContextProvider";
@@ -84,12 +84,19 @@ const App = () => {
           ) : (
             <Routes>
               <Route path="/login" element={<Login />} />
+              {/* <Route path="/loginside" element={<LoginSide />} /> */}
               <Route path="*" element={<Navigate to="/login" />} />
             </Routes>
           )}
         </BrowserRouter>
       </div>
-      <Footer />
+      <div
+        className={
+          activeMenu
+            ? "dark:bg-main-dark-bg bg-main-bg md:ml-72 w-full  "
+            : "bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2 "
+        }
+      > <Footer /></div>
     </>
   );
 };

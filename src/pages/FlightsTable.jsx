@@ -213,7 +213,7 @@ export default function FlightsTable() {
     }));
 
     return (
-        <Paper style={{ padding: "16px", paddingBottom: "50px" }}>
+        <Paper style={{ width: "100%", padding: "20px", overflow: "hidden" }}>
             <Typography variant="h4" gutterBottom>
                 Flights List
             </Typography>
