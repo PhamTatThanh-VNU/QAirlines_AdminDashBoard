@@ -4,7 +4,7 @@ import { MdKeyboardArrowDown } from 'react-icons/md';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 import {UserProfile} from '.'
 import { useStateContext } from '../context/ContextProvider';
-import AuthService from '../services/AuthServices'; // Import AuthService
+import UserService from '../services/UserService'; 
 
 // Component cho nút điều hướng (Menu)
 const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
@@ -31,7 +31,7 @@ const Navbar = () => {
   
     useEffect(() => {
     // Gọi API lấy thông tin người dùng khi component mount
-    AuthService.getUserInfo()
+    UserService.getUserInfo()
       .then((response) => {
         setUser(response.data); 
       })

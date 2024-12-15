@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MdOutlineCancel } from 'react-icons/md';
 import { Button } from '.';
 import { useStateContext } from '../context/ContextProvider';
-import AuthService from '../services/AuthServices'; // Import AuthService
+import UserService from '../services/UserService'; // Import AuthService
 import { CircularProgress } from '@mui/material';
 const handleLogout = () => {
     localStorage.removeItem("token");
@@ -16,7 +16,7 @@ const UserProfile = () => {
 
   useEffect(() => {
     // Gọi API lấy thông tin người dùng khi component mount
-    AuthService.getUserInfo()
+    UserService.getUserInfo()
       .then((response) => {
         setUser(response.data); 
       })
