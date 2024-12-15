@@ -1,17 +1,14 @@
 import React from 'react'
 import './CSS/Footer.css'
 
-const Footer = () => {
+export const Footer = () => {
   return (
     <div className="footer">
       <div className='footer-content'>
         <div className="footer-content-left">
-          <a className='footer-logo' href="#">Global</a>
+          <a className='footer-logo' href="#">Qairline</a>
           <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis et incidunt vero, repellendus deserunt iste tempore esse delectus accusantium deleniti ea praesentium illum rem veniam nulla cupiditate facilis quidem. Excepturi!</p>
           <div className="footer-social-icons">
-            {/* <img src={assets.facebook_icon} alt="" />
-            <img src={assets.twitter_icon} alt="" />
-            <img src={assets.linkedin_icon} alt="" /> */}
           </div>
         </div>
 
@@ -34,7 +31,7 @@ const Footer = () => {
           </ul>
         </div>
       </div>
-      <hr/>
+      <hr />
       <p className='footer-copyright'>Copyright 2024 @ UETVNU.com - All Right Reserved</p>
     </div>
   )

@@ -30,7 +30,7 @@ export const addLocation = async (newLocation) => {
  */
 export const deleteLocation = async (id) => {
   try {
-      await axiosInstance.delete(`${BASE_URL}/delete/${id}`);
+    await axiosInstance.delete(`${BASE_URL}/delete/${id}`);
   } catch (err) {
     throw new Error("Failed to delete location.");
   }
