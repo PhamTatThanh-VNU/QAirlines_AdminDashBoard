@@ -11,23 +11,46 @@ import {
     FormControl,
     InputLabel,
 } from "@mui/material";
-import axios from "axios";
+import { fetchLocations } from "../services"; 
+import { getAllAirCrafts } from "../services";
 
 export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit }) => {
     const [locations, setLocations] = useState([]);
+    const [aircrafts, setAircraft] = useState([]);
     const [formData, setFormData] = useState({});
+    const locationData = async () => {
+            try{
+                const location = await fetchLocations()
+                setLocations(location)
+            }
+            catch(error){
+                console.log(error)
+            }
+        }
+     const aircraftData = async () =>{
+            try{
+                const aircraft = await getAllAirCrafts()            
+                setAircraft(aircraft)
+            }catch(error){
+                console.log(error)
+            }
+        }
 
     useEffect(() => {
-        axios
-            .get("http://localhost:8080/locations/all")
-            .then((response) => setLocations(response.data))
-            .catch((error) => console.error(error));
-    }, []);
+        locationData()
+        aircraftData()
+      } ,[]);
 
     useEffect(() => {
         // Cập nhật formData khi editingFlight thay đổi
         if (editingFlight) {
-            setFormData(editingFlight); // Gán dữ liệu từ chuyến bay đang chỉnh sửa
+            setFormData({
+            ...editingFlight,
+            origin: editingFlight.origin ? `${editingFlight.origin.locationName} (${editingFlight.origin.code})` : "",
+            destination: editingFlight.destination ? `${editingFlight.destination.locationName} (${editingFlight.destination.code})` : "",
+            status: editingFlight.status ? `${editingFlight.status}` : "",
+            aircraft: editingFlight.aircraft ?  `${editingFlight.aircraft.aircraftCode} (${editingFlight.aircraft.manufacturer})`.trim() : ""
+            });
         } else {
             setFormData(
                 columns.reduce((acc, column) => {
@@ -41,7 +64,27 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
     }, [editingFlight, columns]);
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+
+        // Xác định danh sách cần tìm kiếm
+        let lookupList = [];
+        if (name === "origin" || name === "destination") {
+            lookupList = locations; // Sử dụng danh sách locations cho origin/destination
+        } else if (name === "aircraft") {
+            lookupList = aircrafts; // Sử dụng danh sách aircrafts cho aircraft
+        }
+
+        // Tìm đối tượng tương ứng với giá trị được hiển thị
+        const selectedItem = lookupList.find(
+            (item) =>
+                `${item.locationName || item.aircraftCode} (${item.code || item.manufacturer})` === value
+        );
+
+        // Cập nhật formData với id nếu tìm thấy, nếu không thì dùng giá trị nhập
+        setFormData({
+            ...formData,
+            [name]: selectedItem ? selectedItem.id : value,
+        });
     };
 
     const handleSubmit = (e) => {
@@ -62,8 +105,8 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                     {columns
                         .filter((column) => column.field !== "id" && column.field !== "action")
                         .map((column) => {
-                            if (column.field === "departure" || column.field === "destination") {
-                                // Nếu cột là 'departure' hoặc 'destination', render dropdown
+                            if (column.field === "origin" || column.field === "destination") {
+                                // Nếu cột là 'origin' hoặc 'destination', render dropdown
                                 return (
                                     <FormControl key={column.field} fullWidth margin="dense">
                                         <InputLabel>{column.headerName}</InputLabel>
@@ -73,9 +116,9 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                                             value={formData[column.field]}
                                             onChange={handleChange}
                                         >
-                                            {locations.map((location) => (
-                                                <MenuItem key={location.code} value={location.locationName + " (" + location.code + ")"}>
-                                                    {location.locationName + " (" + location.code + ")"}
+                                            {locations.map((location) => (                    
+                                                <MenuItem key={location.id} value={location.locationName + " (" + location.code + ")"}>
+                                                    {location.locationName + " (" + location.code + ")"}                                            
                                                 </MenuItem>
                                             ))}
                                         </Select>
@@ -84,12 +127,12 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                             }
 
                             // nếu cột là departureDate hoặc arrivalDate, render dưới dạng TextField với type="date"
-                            if (column.field === "departureDate" || column.field === "arrivalDate") {
+                            if (column.field === "departureTime" || column.field === "arrivalTime") {
                                 return (
                                     <TextField
                                         key={column.field}
                                         label={column.headerName}
-                                        type="date"
+                                        type="datetime-local"
                                         name={column.field}
                                         value={formData[column.field]}
                                         onChange={handleChange}
@@ -114,14 +157,32 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                                             value={formData.status}
                                             onChange={handleChange}
                                         >
-                                            <MenuItem value="On-time">On-time</MenuItem>
-                                            <MenuItem value="Delayed">Delayed</MenuItem>
-                                            <MenuItem value="Cancelled">Cancelled</MenuItem>
+                                            <MenuItem value="SCHEDULED">Scheduled</MenuItem>
+                                            <MenuItem value="CANCELLED">Cancelled</MenuItem>
+                                            <MenuItem value="COMPLETED">Completed</MenuItem>
                                         </Select>
                                     </FormControl>
                                 );
                             }
-
+                             if (column.field === "aircraft") {
+                                return (
+                                    <FormControl key={column.field} fullWidth margin="dense">
+                                        <InputLabel>{column.headerName}</InputLabel>
+                                        <Select
+                                            label={column.headerName}
+                                            name={column.field}
+                                            value={formData[column.field]}
+                                            onChange={handleChange}
+                                        >
+                                            {aircrafts.map((air) => (
+                                                <MenuItem key={air.id}   value={`${air.aircraftCode} (${air.manufacturer})`.trim()}>
+                                                        {`${air.aircraftCode} (${air.manufacturer})`}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                );
+                            }
                             // nếu cột là availableSeats, price, render dưới dạng TextField với type="number"
                             if (column.field === "availableSeats" || column.field === "price") {
                                 return (

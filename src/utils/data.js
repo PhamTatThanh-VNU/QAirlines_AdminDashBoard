@@ -15,7 +15,7 @@ export const links = [
         icon: <MdFlight />,
       },
       {
-        name: "flightsTable",
+        name: "Flights",
         icon: <TbPlaneInflight />,
       },
     ],

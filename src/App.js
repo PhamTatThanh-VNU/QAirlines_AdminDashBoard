@@ -4,7 +4,7 @@ import { FiSettings } from "react-icons/fi";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 
 import { Sidebar, ThemeSettings, Navbar, Footer } from "./components";
-import { Location, Login, FlightsTable, Aircraft, LoginSide } from "./pages";
+import { Location, Login, Flight, Aircraft } from "./pages";
 import "./App.css";
 
 import { useStateContext } from "./context/ContextProvider";
@@ -76,7 +76,7 @@ const App = () => {
                     {/* dashboard  */}
                     <Route path="/locations" element={<Location />} />
                     <Route path="/aircraft" element={<Aircraft />} />
-                    <Route path="/flightsTable" element={<FlightsTable />} />
+                    <Route path="/flights" element={<Flight />} />
                   </Routes>
                 </div>
               </div>
@@ -96,7 +96,10 @@ const App = () => {
             ? "dark:bg-main-dark-bg bg-main-bg md:ml-72 w-full  "
             : "bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2 "
         }
-      > <Footer /></div>
+      >
+        {" "}
+        <Footer />
+      </div>
     </>
   );
 };
