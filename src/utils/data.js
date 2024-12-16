@@ -1,6 +1,6 @@
 import React from "react";
 import { TbPlaneInflight } from "react-icons/tb";
-import { FaLocationDot } from "react-icons/fa6";
+import { FaLocationDot, FaRegNewspaper } from "react-icons/fa6";
 import { MdFlight } from "react-icons/md";
 export const links = [
   {
@@ -17,6 +17,10 @@ export const links = [
       {
         name: "Flights",
         icon: <TbPlaneInflight />,
+      },
+      {
+        name: "News",
+        icon: <FaRegNewspaper />,
       },
     ],
   },

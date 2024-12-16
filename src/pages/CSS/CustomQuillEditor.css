@@ -1,0 +1,163 @@
+/* Custom styling for Quill Editor */
+.ql-container {
+    border-radius: 0 0 8px 8px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    background: #fff;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+} 
+
+.ql-toolbar {
+    border-radius: 8px 8px 0 0;
+    border: 1px solid #e0e0e0 !important;
+    background: #f8f9fa;
+    padding: 12px !important;
+    border-bottom: none !important;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+/* Button styling */
+.ql-toolbar button {
+    margin: 0 4px;
+    padding: 4px !important;
+    height: 32px !important;
+    width: 32px !important;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.ql-toolbar button:hover {
+    background-color: #e3e6f0 !important;
+}
+
+.ql-toolbar button.ql-active,
+.ql-toolbar button:active {
+    background-color: #4a90e2 !important;
+}
+
+.ql-toolbar button.ql-active .ql-stroke,
+.ql-toolbar button:active .ql-stroke {
+    stroke: #ffffff !important;
+}
+
+.ql-toolbar button.ql-active .ql-fill,
+.ql-toolbar button:active .ql-fill {
+    fill: #ffffff !important;
+}
+
+Dropdown styling
+.ql-toolbar .ql-picker {
+    height: 32px !important;
+}
+
+.ql-toolbar .ql-picker-label {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #555;
+}
+
+.ql-toolbar .ql-picker-label:hover {
+    border-color: #4a90e2;
+}
+
+.ql-toolbar .ql-picker-options {
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    padding: 4px 0;
+    background: #fff;
+}
+
+.ql-toolbar .ql-picker-item {
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+.ql-toolbar .ql-picker-item:hover {
+    background-color: #f0f2f5;
+    color: #4a90e2;
+}
+
+/* Editor content styling */
+.ql-editor {
+    min-height: 300px; 
+    padding: 20px;            
+    line-height: 1.6;
+}
+
+.ql-editor p {
+    margin-bottom: 1em;
+}
+
+.ql-editor h1,
+.ql-editor h2,
+.ql-editor h3 {
+    font-weight: 600;
+}
+
+/* Custom colors */
+.ql-snow .ql-stroke {
+    stroke: #555;
+}
+
+.ql-snow .ql-fill {
+    fill: #555;
+}
+
+.ql-snow .ql-picker-options {
+    background-color: #fff;
+}
+
+/* Custom scrollbar */
+.ql-editor::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ql-editor::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.ql-editor::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.ql-editor::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Code block styling */
+.ql-editor pre.ql-syntax {
+    background-color: #282c34;
+    color: #abb2bf;
+    border-radius: 4px;
+    padding: 1em;
+    margin: 0.5em 0;
+}
+
+/* Blockquote styling */
+.ql-editor blockquote {
+    border-left: 4px solid #4a90e2;
+    padding-left: 16px;
+    color: #666;
+    font-style: italic;
+}
+
+/* Link styling */
+.ql-editor a {
+    color: #4a90e2;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.ql-editor a:hover {
+    color: #357abd;
+    text-decoration: underline;
+}

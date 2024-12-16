@@ -4,7 +4,7 @@ import { FiSettings } from "react-icons/fi";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 
 import { Sidebar, ThemeSettings, Navbar, Footer } from "./components";
-import { Location, Login, Flight, Aircraft } from "./pages";
+import { Location, Login, Flight, Aircraft, NewsManagement } from "./pages";
 import "./App.css";
 
 import { useStateContext } from "./context/ContextProvider";
@@ -77,6 +77,7 @@ const App = () => {
                     <Route path="/locations" element={<Location />} />
                     <Route path="/aircraft" element={<Aircraft />} />
                     <Route path="/flights" element={<Flight />} />
+                    <Route path="/news" element={<NewsManagement />} />
                   </Routes>
                 </div>
               </div>
