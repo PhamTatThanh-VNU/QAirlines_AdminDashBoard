@@ -30,6 +30,25 @@ export const searchFlights = async (originCode, destinationCode, departureTime) 
   }
 };
 
+export const addNewFlight = async (flightDTO) => {
+  try {
+    const response = await axiosInstance.post(`${BASE_URL}/add`, flightDTO);
+    return response.data; 
+  } catch (error) {
+    console.error("Error adding flight: ", error);
+    throw error;
+  }
+}
+export const updateFlight = async(index ,flightDTO) => {
+ try {
+    const response = await axiosInstance.put(`${BASE_URL}/update/${index}`, flightDTO);
+    return response.data; // Dữ liệu chuyến bay cập nhật
+  } catch (error) {
+    console.error("Error updating flight: ", error);
+    throw error; 
+  }
+}
+
 // Xóa một chuyến bay theo ID
 export const deleteFlight = async (id) => {
   try {

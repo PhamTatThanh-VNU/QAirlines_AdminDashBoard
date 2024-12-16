@@ -2,61 +2,41 @@ import React, { useState, useEffect } from "react";
 import { 
   Typography, 
   Paper, 
-  Button, 
-  TextField, 
   IconButton, 
   Snackbar, 
-  Alert 
+  CircularProgress,
+  Alert,
+  Container
 } from "@mui/material";
-import { Edit, Delete, Add, Search } from "@mui/icons-material";
+import { AccessTime, Cancel, CheckCircle, Edit, Delete} from "@mui/icons-material";
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { styled } from '@mui/material/styles';
+import { createTheme ,styled, ThemeProvider } from '@mui/material/styles';
+import { blue, red } from '@mui/material/colors';
 import { AddFlight } from "../components/AddFlight";
 import { getAllFlights, deleteFlight } from "../services/FlightServices";
 
 // Styled Components
 const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(2),
-  backgroundColor: '#f5f5f5',
+  padding: theme.spacing(3),
+  backgroundColor: '#f9fafb',
   borderRadius: theme.spacing(2),
-  boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+  boxShadow: '0 8px 15px rgba(0,0,0,0.1)',
+  marginTop: theme.spacing(4)
 }));
 
-const StyledButton = styled(Button)(({ theme }) => ({
-  margin: theme.spacing(1),
-  borderRadius: theme.spacing(1),
-  textTransform: 'none'
-}));
-
-const StyledTextField = styled(TextField)({
-  '& .MuiOutlinedInput-root': {
-    '&:hover fieldset': {
-      borderColor: 'primary.main',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: 'primary.main',
-    },
-  },
-});
 
 export default function Flight() {
     const [flights, setFlights] = useState([]);
-    const [originCode, setOriginCode] = useState('');
-    const [destinationCode, setDestinationCode] = useState('');
-    const [departureTime, setDepartureTime] = useState('');
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [editingFlight, setEditingFlight] = useState(null);
     
-    // Error State
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState({
-        fetching : false,
-        saving: false,
+        fetching: false,        
         deleting: false 
     });
 
-    // Formatting Date
     const formatDate = (date) => {
         try {
             const [datePart, timePart] = date.split("T");  
@@ -70,25 +50,23 @@ export default function Flight() {
         }
     };
 
-    // Fetch Flights with Error Handling
     useEffect(() => {
         const fetchFlights = async () => {
             try {
                 setLoading((prev) => ({ ...prev, fetching: true }));
                 const flightsData = await getAllFlights();
-                setFlights(flightsData);
+                setFlights(flightsData || []);
                 setError(null);
             } catch (error) {
                 setError("Failed to fetch flights. Please try again.");
                 console.error("Flights fetch error:", error);
             } finally {
-                 setLoading((prev) => ({ ...prev, fetching: false }));
+                setLoading((prev) => ({ ...prev, fetching: false }));
             }
         };
         fetchFlights();
     }, []);
 
-    // Existing handlers with minor error handling
     const handleAddFlight = (newFlight) => {
         try {
             setFlights((prevFlights) => [
@@ -115,7 +93,7 @@ export default function Flight() {
         try {
             setFlights((prevFlights) =>
                 prevFlights.map((flight) =>
-                    flight.id === updatedFlight.id ? updatedFlight : flight
+                    flight.flightId === updatedFlight.flightId ? updatedFlight : flight
                 )
             );
             setOpenEditDialog(false);
@@ -124,22 +102,20 @@ export default function Flight() {
         }
     };
 
-    const handleDeleteFlight = async (index) => {
+    const handleDeleteFlight = async (flightId) => {
         try {
-            setLoading((prev) => ({ ...prev, deleting: true, deletingId: index }));
-            await deleteFlight(index)
-             setFlights((prevFlights) =>
-            prevFlights.filter((flight) => flight.flightId !== index) // Cập nhật danh sách cục bộ
+            setLoading((prev) => ({ ...prev, deleting: true, deletingId: flightId }));
+            await deleteFlight(flightId);
+            setFlights((prevFlights) =>
+                prevFlights.filter((flight) => flight.flightId !== flightId)
             );
         } catch (error) {
             setError("Failed to delete flight. Please try again.");
-        }
-        finally{
+        } finally {
             setLoading((prev) => ({ ...prev, deleting: false, deletingId: null }));
         }
     };
 
-    // Columns definition (unchanged)
     const columns = [    
         { field: "flightNumber", headerName: "Flight Number", width: 100 },
         { field: "origin", headerName: "Departure", width: 150 },
@@ -147,8 +123,31 @@ export default function Flight() {
         { field: "departureTime", headerName: "Departure Date", width: 200 },
         { field: "arrivalTime", headerName: "Arrival Date", width: 200 },
         { field: "price", headerName: "Price ($)", width: 120 },
-        { field: "availableSeats", headerName: "Available Seats", width: 60 },
-        { field: "status", headerName: "Status", width: 120 },
+        { field: "availableBusinessSeats", headerName: "Business Seats", width: 100 },
+        { field: "availableEconomySeats", headerName: "Economy Seats", width: 100 },
+        {
+        field: "status", 
+        headerName: "Status", 
+        width: 60,
+        renderCell: (params) => {
+            const status = params.value;
+            let icon;
+            switch(status) {
+                case 'SCHEDULED':
+                    icon = <AccessTime color="primary" />;
+                    break;
+                case 'CANCELLED':
+                    icon = <Cancel color="error" />;
+                    break;
+                case 'COMPLETED':
+                    icon = <CheckCircle color="success" />;
+                    break;
+                default:
+                    icon = null;
+            }
+            return icon; // Trả về chỉ icon cần thiết cho cột này
+        }
+        },
         { field: "aircraft", headerName: "Aircraft", width: 90 },
         {
             field: "action", 
@@ -157,85 +156,112 @@ export default function Flight() {
             sortable: false,
             renderCell: (params) => (
                 <>
-                    <IconButton color="primary" onClick={() => handleEditFlight(params.row.id - 1)}>
+                    <IconButton 
+                        color="primary" 
+                        onClick={() => handleEditFlight(params.row.id - 1)}
+                        disabled={loading.deleting && loading.deletingId === params.row.id}
+                    >
                         <Edit />
                     </IconButton>
-                    <IconButton color="secondary" onClick={() => handleDeleteFlight(params.row.id)} 
-                        disabled = {loading.deleting && loading.deletingId === params.row.id}>
-                    <Delete />
+                    <IconButton 
+                        color="secondary" 
+                        onClick={() => handleDeleteFlight(params.row.id)} 
+                        disabled={loading.deleting && loading.deletingId === params.row.id}
+                    >
+                        {loading.deleting && loading.deletingId === params.row.id ? (
+                            <CircularProgress size={24} color="inherit" />
+                        ) : (
+                            <Delete />
+                        )}                    
                     </IconButton>
                 </>
             ),
         },
     ];
 
-    // Rows mapping (unchanged)
     const rows = flights.map((flight) => ({
         id: flight.flightId,
-        flightNumber: flight.flightNumber,
-        origin: flight.origin.airportName,
-        destination: flight.destination.airportName,
-        departureTime: formatDate(flight.departureTime),
-        arrivalTime: formatDate(flight.arrivalTime),
-        price: flight.price,
-        availableSeats: flight.availableSeats,
-        status: flight.status,
-        aircraft: flight.aircraft.aircraftCode,
+        flightNumber: flight.flightNumber || 'N/A',
+        origin: flight.origin?.airportName || 'Unknown',
+        destination: flight.destination?.airportName || 'Unknown',
+        departureTime: flight.departureTime ? formatDate(flight.departureTime) : 'N/A',
+        arrivalTime: flight.arrivalTime ? formatDate(flight.arrivalTime) : 'N/A',
+        price: flight.price || 0,
+        availableBusinessSeats: flight.availableBusinessSeats || 0,
+        availableEconomySeats: flight.availableEconomySeats || 0,
+        status: flight.status || 'Unknown',
+        aircraft: flight.aircraft?.aircraftCode || 'N/A',
     }));
 
+    const theme = createTheme({
+        palette: {
+            primary: {
+                main: blue[700],
+            },
+            secondary: {
+                main: red[600],
+            },
+            background: {
+                default: '#f4f6f8',
+                paper: '#ffffff',
+            },
+        },
+        components: {
+            MuiDataGrid: {
+                styleOverrides: {
+                    root: {
+                        border: 'none',
+                        borderRadius: 12,
+                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                        '& .MuiDataGrid-cell': {
+                            borderBottom: '1px solid rgba(224, 224, 224, 1)',
+                        },
+                        '& .MuiDataGrid-columnHeaders': {
+                            backgroundColor: blue[50],
+                            color: blue[800],
+                            fontWeight: 600,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px',
+                            borderBottom: `2px solid ${blue[200]}`,
+                        },
+                        '& .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-cell:focus': {
+                            outline: 'none',
+                        },
+                        '& .MuiDataGrid-row:hover': {
+                            backgroundColor: blue[50],
+                        },
+                        '& .MuiDataGrid-selectedRow': {
+                            backgroundColor: `${blue[100]}!important`,
+                        },
+                    },
+                },
+            },
+        },
+    });
+
     return (
-        <StyledPaper>
-            <Typography variant="h4" gutterBottom>
-                Flights List
-            </Typography>
-
-            {/* Search and Filter Section */}
-            <div style={{ marginBottom: "20px" }}>
-                <StyledTextField
-                    label="Origin Code"
-                    variant="outlined"
-                    value={originCode}
-                    onChange={(e) => setOriginCode(e.target.value)}
-                    style={{ marginRight: "10px" }}
-                />
-                <StyledTextField
-                    label="Destination Code"
-                    variant="outlined"
-                    value={destinationCode}
-                    onChange={(e) => setDestinationCode(e.target.value)}
-                    style={{ marginRight: "10px" }}
-                />
-                <StyledTextField
-                    label="Departure Date"
-                    type="date"
-                    variant="outlined"
-                    value={departureTime}
-                    onChange={(e) => setDepartureTime(e.target.value)}
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                    style={{ marginRight: "10px" }}
-                />
-                <StyledButton
-                    variant="contained"
-                    color="primary"
-                    startIcon={<Search />}
-                >
-                    Search Flights
-                </StyledButton>
-
-                <StyledButton
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<Add />}
-                    onClick={() => setOpenAddDialog(true)}
-                >
-                    Add Flight
-                </StyledButton>
-            </div>
-
-            {/* Data Grid */}
-            <div style={{ height: 600, width: "100%" }}>
+        <Container maxWidth="xl">
+            <StyledPaper elevation={3}>
+                <Typography 
+                            variant="h4" 
+                            gutterBottom 
+                            sx={{ 
+                              mb: 3, 
+                              fontWeight: 'bold', 
+                              color: '#2c3e50',
+                              textAlign: 'center'
+                            }}
+                          >
+                            Quản lí chuyến bay
+                </Typography>        
+            <ThemeProvider theme={theme}>
+                <div style={{ 
+                height: 600, 
+                width: "100%", 
+                backgroundColor: '#f4f6f8',
+                padding: '16px',
+                borderRadius: 12
+            }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}
@@ -247,49 +273,100 @@ export default function Flight() {
                             }
                         },
                     }}
-                    slots={{ toolbar: GridToolbar }}
+                    slots={{ 
+                        toolbar: GridToolbar,
+                        noRowsOverlay: () => (
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: '100%',
+                                color: blue[500],
+                                fontWeight: 500
+                            }}>
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    width="100" 
+                                    height="100" 
+                                    viewBox="0 0 24 24" 
+                                    fill="none" 
+                                    stroke={blue[500]} 
+                                    strokeWidth="1" 
+                                    style={{ opacity: 0.5, marginBottom: 16 }}
+                                >
+                                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                </svg>
+                                No Flights Available
+                            </div>
+                        )
+                    }}
                     slotProps={{
                         toolbar: {
                             showQuickFilter: true,
-                            quickFilterProps: { placeholder: 'Search...', debounceMs: 400 },
+                            quickFilterProps: { 
+                                placeholder: 'Search flights...', 
+                                debounceMs: 400,
+                                variant: 'outlined',
+                                size: 'small',
+                                sx: {
+                                    backgroundColor: 'white',
+                                    borderRadius: 2,
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: blue[200],
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: blue[400],
+                                        },
+                                    }
+                                }
+                            },
                         }
                     }}
                     checkboxSelection
                     disableRowSelectionOnClick
+                    pageSizeOptions={[5, 10, 25]}
+                    sx={{
+                        '& .MuiDataGrid-footerContainer': {
+                            backgroundColor: blue[50],
+                            borderTop: `1px solid ${blue[100]}`,
+                        }
+                    }}
                 />
             </div>
-
-            {/* Error Snackbar */}
-            <Snackbar
-                open={!!error}
-                autoHideDuration={6000}
-                onClose={() => setError(null)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            >
-                <Alert 
-                    onClose={() => setError(null)} 
-                    severity="error" 
-                    sx={{ width: '100%' }}
+            </ThemeProvider>
+                <Snackbar
+                    open={!!error}
+                    autoHideDuration={6000}
+                    onClose={() => setError(null)}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 >
-                    {error}
-                </Alert>
-            </Snackbar>
+                    <Alert 
+                        onClose={() => setError(null)} 
+                        severity="error" 
+                        sx={{ width: '100%' }}
+                    >
+                        {error}
+                    </Alert>
+                </Snackbar>
 
-            {/* Existing Dialogs */}
-            <AddFlight
-                open={openAddDialog}
-                onClose={() => setOpenAddDialog(false)}
-                columns={columns}
-                onAdd={handleAddFlight}
-            />
+                <AddFlight
+                    open={openAddDialog}
+                    onClose={() => setOpenAddDialog(false)}
+                    columns={columns}
+                    onAdd={handleAddFlight}
+                />
 
-            <AddFlight
-                open={openEditDialog}
-                onClose={() => setOpenEditDialog(false)}
-                columns={columns}
-                editingFlight={editingFlight}
-                onEdit={handleSaveEditedFlight}
-            />
-        </StyledPaper>
+                <AddFlight
+                    open={openEditDialog}
+                    onClose={() => setOpenEditDialog(false)}
+                    columns={columns}
+                    editingFlight={editingFlight}
+                    onEdit={handleSaveEditedFlight}
+                />
+            </StyledPaper>
+        </Container>
     );
 }

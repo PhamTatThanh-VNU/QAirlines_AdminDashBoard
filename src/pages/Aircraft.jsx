@@ -44,7 +44,8 @@ const Aircraft = () => {
     aircraftCode: '',
     manufacturer: '',
     model: '',
-    seatCapacity: ''
+    businessCapacity: '',
+    economyCapacity:''
   });
   const [isEditing, setIsEditing] = useState(false);
 
@@ -124,7 +125,8 @@ const Aircraft = () => {
         aircraftCode: '',
         manufacturer: '',
         model: '',
-        seatCapacity: ''
+        economyCapacity: '',
+        businessCapacity:''
       });
       setIsEditing(false);
     }
@@ -147,8 +149,8 @@ const Aircraft = () => {
 
   // Save aircraft (add or edit)
   const handleSaveAircraft = async () => {
-    const { aircraftCode, manufacturer, model, seatCapacity } = currentAircraft;
-    if (!aircraftCode || !manufacturer || !model || !seatCapacity) {
+    const { aircraftCode, manufacturer, model, economyCapacity, businessCapacity } = currentAircraft;
+    if (!aircraftCode || !manufacturer || !model || !economyCapacity || !businessCapacity) {
       handleError('Please fill in all the fields before saving.', 'error');
       return;
     }
@@ -304,7 +306,8 @@ const Aircraft = () => {
                   <TableCell>Aircraft Code</TableCell>
                   <TableCell>Manufacturer</TableCell>
                   <TableCell>Model Number</TableCell>
-                  <TableCell>Seat Capacity</TableCell>        
+                  <TableCell>Business Capacity</TableCell>        
+                  <TableCell>Economy Capacity</TableCell>        
                   <TableCell align="right">Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -325,7 +328,8 @@ const Aircraft = () => {
                     <TableCell>{aircraft.aircraftCode}</TableCell>
                     <TableCell>{aircraft.manufacturer}</TableCell>
                     <TableCell>{aircraft.model}</TableCell>
-                    <TableCell>{aircraft.seatCapacity}</TableCell>                
+                    <TableCell>{aircraft.businessCapacity}</TableCell>
+                    <TableCell>{aircraft.economyCapacity}</TableCell>                                
                     <TableCell align="right">
                       <IconButton 
                         color="primary"
@@ -414,12 +418,23 @@ const Aircraft = () => {
             />
             <TextField
               margin="dense"
-              name="seatCapacity"
-              label="Seat Capacity"
+              name="businessCapacity"
+              label="Business Capacity"
               type="number"
               fullWidth
               variant="outlined"
-              value={currentAircraft.seatCapacity}
+              value={currentAircraft.businessCapacity}
+              onChange={handleInputChange}
+              disabled={isLoading.saving}
+            />
+            <TextField
+              margin="dense"
+              name="economyCapacity"
+              label="Economy Capacity"
+              type="number"
+              fullWidth
+              variant="outlined"
+              value={currentAircraft.economyCapacity}
               onChange={handleInputChange}
               disabled={isLoading.saving}
             />
@@ -437,7 +452,7 @@ const Aircraft = () => {
           onClick={handleSaveAircraft} 
           color="primary" 
           variant="contained"
-          disabled={isLoading.saving || !currentAircraft.aircraftCode || !currentAircraft.manufacturer || !currentAircraft.model || !currentAircraft.seatCapacity}
+          disabled={isLoading.saving || !currentAircraft.aircraftCode || !currentAircraft.manufacturer || !currentAircraft.model || !currentAircraft.economyCapacity || !currentAircraft.businessCapacity}
           >
             {isLoading.saving ? <CircularProgress size={24} color="inherit" /> : (isEditing ? 'Update' : 'Add')}
           </Button>

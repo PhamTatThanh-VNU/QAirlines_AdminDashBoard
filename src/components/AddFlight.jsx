@@ -10,52 +10,58 @@ import {
     Select,
     FormControl,
     InputLabel,
+    CircularProgress,
+    Alert
 } from "@mui/material";
 import { fetchLocations } from "../services"; 
 import { getAllAirCrafts } from "../services";
+import { addNewFlight, updateFlight } from "../services/FlightServices";
 
 export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit }) => {
     const [locations, setLocations] = useState([]);
     const [aircrafts, setAircraft] = useState([]);
     const [formData, setFormData] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+
     const locationData = async () => {
-            try{
-                const location = await fetchLocations()
-                setLocations(location)
-            }
-            catch(error){
-                console.log(error)
-            }
+        try {
+            const location = await fetchLocations()
+            setLocations(location)
         }
-     const aircraftData = async () =>{
-            try{
-                const aircraft = await getAllAirCrafts()            
-                setAircraft(aircraft)
-            }catch(error){
-                console.log(error)
-            }
+        catch(error) {
+            console.log(error)
         }
+    }
+
+    const aircraftData = async () => {
+        try {
+            const aircraft = await getAllAirCrafts()            
+            setAircraft(aircraft)
+        } catch(error) {
+            console.log(error)
+        }
+    }
 
     useEffect(() => {
         locationData()
         aircraftData()
-      } ,[]);
+    } ,[]);
 
     useEffect(() => {
-        // Cập nhật formData khi editingFlight thay đổi
         if (editingFlight) {
             setFormData({
-            ...editingFlight,
-            origin: editingFlight.origin ? `${editingFlight.origin.locationName} (${editingFlight.origin.code})` : "",
-            destination: editingFlight.destination ? `${editingFlight.destination.locationName} (${editingFlight.destination.code})` : "",
-            status: editingFlight.status ? `${editingFlight.status}` : "",
-            aircraft: editingFlight.aircraft ?  `${editingFlight.aircraft.aircraftCode} (${editingFlight.aircraft.manufacturer})`.trim() : ""
+                ...editingFlight,
+                origin: editingFlight.origin ? `${editingFlight.origin.locationName} (${editingFlight.origin.code})` : "",
+                destination: editingFlight.destination ? `${editingFlight.destination.locationName} (${editingFlight.destination.code})` : "",
+                status: editingFlight.status ? `${editingFlight.status}` : "",
+                aircraft: editingFlight.aircraft ?  `${editingFlight.aircraft.aircraftCode} (${editingFlight.aircraft.manufacturer})`.trim() : ""
             });
         } else {
             setFormData(
                 columns.reduce((acc, column) => {
                     if (column.field !== "id" && column.field !== "action") {
-                        acc[column.field] = "";         // Đặt giá trị mặc định là rỗng nếu không chỉnh sửa
+                        acc[column.field] = "";        
                     }
                     return acc;
                 }, {})
@@ -63,38 +69,152 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
         }
     }, [editingFlight, columns]);
 
+    const validateForm = () => {
+        const newErrors = {};
+        
+        // Validate Origin and Destination
+        if (!formData.origin) {
+            newErrors.origin = "Origin is required";
+        }
+        if (!formData.destination) {
+            newErrors.destination = "Destination is required";
+        }
+        if (formData.origin === formData.destination) {
+            newErrors.destination = "Destination cannot be the same as Origin";
+        }
+
+        // Validate Date Times
+        const now = new Date();
+        const departureTime = new Date(formData.departureTime);
+        const arrivalTime = new Date(formData.arrivalTime);
+
+        if (!formData.departureTime) {
+            newErrors.departureTime = "Departure time is required";
+        } else if (departureTime < now && !editingFlight) {
+            newErrors.departureTime = "Departure time must be in the future";
+        }
+
+        if (!formData.arrivalTime) {
+            newErrors.arrivalTime = "Arrival time is required";
+        } else if (arrivalTime <= departureTime) {
+            newErrors.arrivalTime = "Arrival time must be after departure time";
+        }
+
+        // Validate other required fields
+        const requiredFields = [
+            'flightNumber', 'price', 'availableEconomySeats', 
+            'availableBusinessSeats', 'status', 'aircraft'
+        ];
+
+        requiredFields.forEach(field => {
+            if (!formData[field]) {
+                newErrors[field] = `${field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} is required`;
+            }
+        });
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // Xác định danh sách cần tìm kiếm
-        let lookupList = [];
-        if (name === "origin" || name === "destination") {
-            lookupList = locations; // Sử dụng danh sách locations cho origin/destination
-        } else if (name === "aircraft") {
-            lookupList = aircrafts; // Sử dụng danh sách aircrafts cho aircraft
+        // Clear the specific error when user starts typing
+        if (errors[name]) {
+            setErrors(prev => ({...prev, [name]: ''}));
         }
 
-        // Tìm đối tượng tương ứng với giá trị được hiển thị
+        let lookupList = [];
+        if (name === "origin" || name === "destination") {
+            lookupList = locations;
+        } else if (name === "aircraft") {
+            lookupList = aircrafts;
+        }
+
         const selectedItem = lookupList.find(
             (item) =>
-                `${item.locationName || item.aircraftCode} (${item.code || item.manufacturer})` === value
+                `${item.locationName || item.aircraftCode} (${item.aircraftCode || item.manufacturer})` === value
         );
 
-        // Cập nhật formData với id nếu tìm thấy, nếu không thì dùng giá trị nhập
         setFormData({
             ...formData,
-            [name]: selectedItem ? selectedItem.id : value,
+            [name]: selectedItem ? `${selectedItem.locationName} (${selectedItem.code})` : value,
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (editingFlight) {
-            onEdit(formData); // Gửi dữ liệu chỉnh sửa
-        } else {
-            onAdd(formData); // Gửi dữ liệu thêm mới
+        
+        if (!validateForm()) {
+            return;
         }
-        onClose();
+        
+        try {
+            const originLocation = locations.find(loc => 
+                loc.locationName + " (" + loc.code + ")" === formData.origin
+            );
+
+            const destinationLocation = locations.find(loc => 
+                loc.locationName + " (" + loc.code + ")" === formData.destination
+            );
+
+            const selectedAircraft = aircrafts.find(air => 
+                (air.aircraftCode + " (" + air.manufacturer + ")").trim() === formData.aircraft
+            );
+
+            const flightDTO = {
+                flightId: editingFlight ? editingFlight.flightId : null,
+                flightNumber: formData.flightNumber,
+                origin: {
+                    id: originLocation.id,
+                    locationName: originLocation.locationName,
+                    airportName: originLocation.airportName,
+                    code: originLocation.code
+                },
+                destination: {
+                    id: destinationLocation.id,
+                    locationName: destinationLocation.locationName,
+                    airportName: destinationLocation.airportName,
+                    code: destinationLocation.code
+                },
+                departureTime: formData.departureTime,
+                arrivalTime: formData.arrivalTime,
+                price: parseFloat(formData.price),
+                availableEconomySeats: parseInt(formData.availableEconomySeats),
+                availableBusinessSeats: parseInt(formData.availableBusinessSeats),
+                status: formData.status,
+                aircraft: {
+                    id: selectedAircraft.id,
+                    aircraftCode: selectedAircraft.aircraftCode,
+                    manufacturer: selectedAircraft.manufacturer,
+                    model: selectedAircraft.model,
+                    economyCapacity: selectedAircraft.economyCapacity,
+                    businessCapacity: selectedAircraft.businessCapacity
+                },
+                createdAt: new Date().toISOString()
+            };
+            
+            let response
+            setLoading(true)
+            if (editingFlight) {
+                response = await updateFlight(editingFlight.flightId, flightDTO); 
+            } else {    
+                response = await addNewFlight(flightDTO);
+            }
+
+            if (editingFlight) {
+                onEdit(response);
+            } else {
+                onAdd(response);
+            }
+            
+            onClose();
+        } catch (error) {
+            console.error("Error adding/editing flight:", error);
+        }
+        finally {
+            setLoading(false)
+        }
     };
 
     return (
@@ -106,27 +226,38 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                         .filter((column) => column.field !== "id" && column.field !== "action")
                         .map((column) => {
                             if (column.field === "origin" || column.field === "destination") {
-                                // Nếu cột là 'origin' hoặc 'destination', render dropdown
                                 return (
-                                    <FormControl key={column.field} fullWidth margin="dense">
+                                    <FormControl 
+                                        key={column.field} 
+                                        fullWidth 
+                                        margin="dense" 
+                                        error={!!errors[column.field]}
+                                    >
                                         <InputLabel>{column.headerName}</InputLabel>
                                         <Select
                                             label={column.headerName}
                                             name={column.field}
-                                            value={formData[column.field]}
+                                            value={formData[column.field] || ''}
                                             onChange={handleChange}
                                         >
                                             {locations.map((location) => (                    
-                                                <MenuItem key={location.id} value={location.locationName + " (" + location.code + ")"}>
+                                                <MenuItem 
+                                                    key={location.id} 
+                                                    value={location.locationName + " (" + location.code + ")"}
+                                                >
                                                     {location.locationName + " (" + location.code + ")"}                                            
                                                 </MenuItem>
                                             ))}
                                         </Select>
+                                        {errors[column.field] && (
+                                            <Alert severity="error" style={{marginTop: 8}}>
+                                                {errors[column.field]}
+                                            </Alert>
+                                        )}
                                     </FormControl>
                                 );
                             }
 
-                            // nếu cột là departureDate hoặc arrivalDate, render dưới dạng TextField với type="date"
                             if (column.field === "departureTime" || column.field === "arrivalTime") {
                                 return (
                                     <TextField
@@ -134,56 +265,81 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                                         label={column.headerName}
                                         type="datetime-local"
                                         name={column.field}
-                                        value={formData[column.field]}
+                                        value={formData[column.field] || ''}
                                         onChange={handleChange}
                                         fullWidth
                                         margin="dense"
                                         variant="outlined"
                                         InputLabelProps={{
-                                            shrink: true, // Đảm bảo nhãn vẫn hiển thị đúng khi người dùng chọn ngày
+                                            shrink: true,
                                         }}
+                                        error={!!errors[column.field]}
+                                        helperText={errors[column.field]}
                                     />
                                 );
                             }
 
-                            // nếu cột là status, render dưới dạng dropdown
                             if (column.field === "status") {
                                 return (
-                                    <FormControl key={column.field} fullWidth margin="dense">
+                                    <FormControl 
+                                        key={column.field} 
+                                        fullWidth 
+                                        margin="dense" 
+                                        error={!!errors[column.field]}
+                                    >
                                         <InputLabel>Status</InputLabel>
                                         <Select
                                             label="Status"
                                             name="status"
-                                            value={formData.status}
+                                            value={formData.status || ''}
                                             onChange={handleChange}
                                         >
                                             <MenuItem value="SCHEDULED">Scheduled</MenuItem>
                                             <MenuItem value="CANCELLED">Cancelled</MenuItem>
                                             <MenuItem value="COMPLETED">Completed</MenuItem>
                                         </Select>
+                                        {errors.status && (
+                                            <Alert severity="error" style={{marginTop: 8}}>
+                                                {errors.status}
+                                            </Alert>
+                                        )}
                                     </FormControl>
                                 );
                             }
-                             if (column.field === "aircraft") {
+
+                            if (column.field === "aircraft") {
                                 return (
-                                    <FormControl key={column.field} fullWidth margin="dense">
+                                    <FormControl 
+                                        key={column.field} 
+                                        fullWidth 
+                                        margin="dense" 
+                                        error={!!errors[column.field]}
+                                    >
                                         <InputLabel>{column.headerName}</InputLabel>
                                         <Select
                                             label={column.headerName}
                                             name={column.field}
-                                            value={formData[column.field]}
+                                            value={formData[column.field] || ''}
                                             onChange={handleChange}
                                         >
                                             {aircrafts.map((air) => (
-                                                <MenuItem key={air.id}   value={`${air.aircraftCode} (${air.manufacturer})`.trim()}>
-                                                        {`${air.aircraftCode} (${air.manufacturer})`}
+                                                <MenuItem 
+                                                    key={air.id}   
+                                                    value={`${air.aircraftCode} (${air.manufacturer})`.trim()}
+                                                >
+                                                    {`${air.aircraftCode} (${air.manufacturer})`}
                                                 </MenuItem>
                                             ))}
                                         </Select>
+                                        {errors[column.field] && (
+                                            <Alert severity="error" style={{marginTop: 8}}>
+                                                {errors[column.field]}
+                                            </Alert>
+                                        )}
                                     </FormControl>
                                 );
                             }
-                            // nếu cột là availableSeats, price, render dưới dạng TextField với type="number"
+
                             if (column.field === "availableSeats" || column.field === "price") {
                                 return (
                                     <TextField
@@ -191,28 +347,31 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                                         label={column.headerName}
                                         type="number"
                                         name={column.field}
-                                        value={formData[column.field]}
+                                        value={formData[column.field] || ''}
                                         onChange={handleChange}
                                         fullWidth
                                         margin="dense"
                                         variant="outlined"
                                         inputProps={{ min: 0 }}
+                                        error={!!errors[column.field]}
+                                        helperText={errors[column.field]}
                                     />
                                 );
                             }
 
-                            // Các cột khác vẫn render dưới dạng TextField
                             return (
                                 <TextField
                                     key={column.field}
                                     label={column.headerName}
                                     type={column.type || "text"}
                                     name={column.field}
-                                    value={formData[column.field]}
+                                    value={formData[column.field] || ''}
                                     onChange={handleChange}
                                     fullWidth
                                     margin="dense"
                                     variant="outlined"
+                                    error={!!errors[column.field]}
+                                    helperText={errors[column.field]}
                                 />
                             );
                         })}
@@ -222,8 +381,14 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                 <Button onClick={onClose} color="secondary">
                     Cancel
                 </Button>
-                <Button onClick={handleSubmit} color="primary">
-                    {editingFlight ? "Save Changes" : "Add"}
+                <Button 
+                    onClick={handleSubmit} 
+                    color="primary" 
+                    disabled={loading}
+                    variant="contained"
+                    startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+                >
+                    {loading ? "Processing..." : (editingFlight ? "Save Changes" : "Add")}
                 </Button>
             </DialogActions>
         </Dialog>
