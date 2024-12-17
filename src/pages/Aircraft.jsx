@@ -20,12 +20,14 @@ import {
   Alert,
   CircularProgress,
   TablePagination,
-  InputAdornment
+  InputAdornment,
+  useTheme
 } from '@mui/material';
 import { 
   Add as AddIcon, 
   Edit as EditIcon, 
-  Delete as DeleteIcon ,
+  Delete as DeleteIcon,
+  Flight as FlightIcon 
 } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import { 
@@ -34,6 +36,74 @@ import {
   updateAirCraft, 
   deleteAirCraft 
 } from '../services';
+
+// Custom styles
+const styles = {
+  gradientBackground: {
+    background: 'linear-gradient(120deg, #1a237e 0%, #0d47a1 100%)',
+    color: '#ffffff',
+    borderRadius: '16px',
+    padding: '24px',
+    marginBottom: '24px',
+  },
+  tableContainer: {
+    background: '#ffffff',
+    borderRadius: '16px',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+    overflow: 'hidden',
+  },
+  tableHeader: {
+    background: 'linear-gradient(90deg, #1e88e5 0%, #1976d2 100%)',
+    '& .MuiTableCell-head': {
+      color: '#ffffff',
+      fontWeight: 'bold',
+      fontSize: '1rem',
+    },
+  },
+  actionButton: {
+    borderRadius: '12px',
+    textTransform: 'none',
+    padding: '8px 24px',
+    fontWeight: 'bold',
+    transition: 'all 0.3s ease',
+  },
+  searchField: {
+    background: '#ffffff',
+    borderRadius: '12px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: 'transparent',
+      },
+      '&:hover fieldset': {
+        borderColor: '#1976d2',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#1976d2',
+      },
+    },
+  },
+  dialogTitle: {
+    background: 'linear-gradient(90deg, #1e88e5 0%, #1976d2 100%)',
+    color: '#ffffff',
+    padding: '16px 24px',
+  },
+  dialogContent: {
+    padding: '24px',
+  },
+  tableRow: {
+    '&:hover': {
+      background: 'rgba(25, 118, 210, 0.08)',
+    },
+  },
+  iconButton: {
+    borderRadius: '12px',
+    padding: '8px',
+    '&:hover': {
+      background: 'rgba(25, 118, 210, 0.1)',
+    },
+  },
+};
 
 const Aircraft = () => {
   // State for aircraft data and management
@@ -207,141 +277,114 @@ const Aircraft = () => {
   );
 
   return (
-    <Box 
-      sx={{ 
-        width: '100%', 
-        p: 3,
-        background: 'linear-gradient(135deg, #f6f8f9 0%, #e5ebee 100%)',
-        position: 'relative'
-      }}
-    >
-      {/* Hiển thị khi loading */}
+    <Box sx={{ p: 3, minHeight: '100vh', background: '#f5f5f5' }}>
       {isLoading.fetching ? (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
-          <CircularProgress />
-      </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+          <CircularProgress size={60} thickness={4} />
+        </Box>
       ) : (
         <>
-          <Typography 
-            variant="h4" 
-            gutterBottom 
+          {/* Header Section */}
+          <Box 
             sx={{ 
-              mb: 3, 
-              fontWeight: 'bold', 
-              color: '#2c3e50',
-              textAlign: 'center'
+              ...styles.gradientBackground, 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              textAlign: 'center' // Căn giữa văn bản
             }}
           >
-            Quản lí tàu bay
-          </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <FlightIcon sx={{ fontSize: 40, mr: 2 }} />
+              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                Quản lí tàu bay
+              </Typography>
+            </Box>
+            <Typography variant="subtitle1" sx={{ opacity: 0.8 }}>
+              Quản lí phương tiện dễ dàng và hiệu quả hơn
+            </Typography>
+          </Box>
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2 }}>
+
+          {/* Search and Add Section */}
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              gap: 2, 
+              mb: 3, 
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
             <TextField
-              label="Search by Aircraft Code"
+              placeholder="Search aircraft..."
               variant="outlined"
-              size="small"
+              size="medium"
               value={searchAircraftCode}
               onChange={(e) => setSearchAircraftCode(e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon sx={{ color: '#5A9BD5' }} />
+                    <SearchIcon color="primary" />
                   </InputAdornment>
                 ),
               }}
-              sx={{
-                flexGrow: 1,
-                mr:2,
-                background: 'linear-gradient(135deg, #E3F2FD, #BBDEFB)',
-                borderRadius: '8px',
-                boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: '#90CAF9',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: '#42A5F5',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#1E88E5',
-                  },
-                },
-                '& .MuiInputLabel-root': {
-                  color: '#1976D2',
-                },
-                '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#1E88E5',
-                },
-              }}
+              sx={{ ...styles.searchField, flexGrow: 1, maxWidth: '500px' }}
             />
-            <Button 
-              variant="contained" 
-              color="primary" 
+            <Button
+              variant="contained"
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog()}
-              disabled={isLoading.fetching}
-              sx={{ 
-                background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+              sx={{
+                ...styles.actionButton,
+                background: 'linear-gradient(90deg, #2196f3 0%, #1976d2 100%)',
                 '&:hover': {
-                  background: 'linear-gradient(45deg, #2196F3 10%, #21CBF3 70%)'
-                }
+                  background: 'linear-gradient(90deg, #1976d2 0%, #1565c0 100%)',
+                },
               }}
             >
               Add New Aircraft
             </Button>
           </Box>
 
-          <TableContainer 
-            component={Paper} 
-            elevation={3} 
-            sx={{ 
-              borderRadius: 2,
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-              position: 'relative'
-            }}
-          >
-            <Table sx={{ minWidth: 650 }}>
-              <TableHead sx={{ background: '#f0f4f8' }}>
-                <TableRow>        
+          {/* Table Section */}
+          <TableContainer component={Paper} sx={styles.tableContainer}>
+            <Table>
+              <TableHead sx={styles.tableHeader}>
+                <TableRow>
                   <TableCell>Aircraft Code</TableCell>
                   <TableCell>Manufacturer</TableCell>
                   <TableCell>Model Number</TableCell>
-                  <TableCell>Business Capacity</TableCell>        
-                  <TableCell>Economy Capacity</TableCell>        
+                  <TableCell>Business Capacity</TableCell>
+                  <TableCell>Economy Capacity</TableCell>
                   <TableCell align="right">Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {(rowsPerPage > 0
-                    ? filteredAircrafts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    : filteredAircrafts
-                  ).map((aircraft) => (
-                  <TableRow 
-                    key={aircraft.id}
-                    hover
-                    sx={{ 
-                      '&:last-child td, &:last-child th': { border: 0 },
-                      '&:hover': { background: 'rgba(0, 0, 0, 0.04)' },
-                      opacity: isLoading.deleting && isLoading.deletingId === aircraft.id ? 0.5 : 1
-                    }}
-                  >            
-                    <TableCell>{aircraft.aircraftCode}</TableCell>
+                  ? filteredAircrafts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  : filteredAircrafts
+                ).map((aircraft) => (
+                  <TableRow key={aircraft.id} sx={styles.tableRow}>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                      {aircraft.aircraftCode}
+                    </TableCell>
                     <TableCell>{aircraft.manufacturer}</TableCell>
                     <TableCell>{aircraft.model}</TableCell>
                     <TableCell>{aircraft.businessCapacity}</TableCell>
-                    <TableCell>{aircraft.economyCapacity}</TableCell>                                
+                    <TableCell>{aircraft.economyCapacity}</TableCell>
                     <TableCell align="right">
-                      <IconButton 
-                        color="primary"
+                      <IconButton
                         onClick={() => handleOpenDialog(aircraft)}
-                        disabled={isLoading.deleting || isLoading.fetching}
+                        sx={{ ...styles.iconButton, color: '#1976d2' }}
                       >
                         <EditIcon />
                       </IconButton>
-                      <IconButton 
-                        color="error"
+                      <IconButton
                         onClick={() => handleDeleteAircraft(aircraft.id)}
-                        disabled={isLoading.deleting || isLoading.fetching}
+                        sx={{ ...styles.iconButton, color: '#d32f2f', ml: 1 }}
                       >
                         {isLoading.deleting && isLoading.deletingId === aircraft.id ? (
                           <CircularProgress size={24} color="inherit" />
@@ -354,126 +397,153 @@ const Aircraft = () => {
                 ))}
                 {filteredAircrafts.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} align="center">
-                      No aircrafts found matching "{searchAircraftCode}"
+                    <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                      <Typography variant="h6" color="textSecondary">
+                        No aircraft found matching "{searchAircraftCode}"
+                      </Typography>
                     </TableCell>
                   </TableRow>
                 )}
               </TableBody>
             </Table>
             <TablePagination
-                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                component="div"
-                count={filteredAircrafts.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
+              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+              component="div"
+              count={filteredAircrafts.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              sx={{
+                borderTop: '1px solid rgba(224, 224, 224, 1)',
+              }}
+            />
           </TableContainer>
+
+          {/* Dialog */}
+          <Dialog 
+            open={open} 
+            onClose={handleCloseDialog}
+            maxWidth="md"
+            fullWidth
+            PaperProps={{
+              sx: {
+                borderRadius: '16px',
+                overflow: 'hidden',
+              },
+            }}
+          >
+            <DialogTitle sx={styles.dialogTitle}>
+              {isEditing ? 'Edit Aircraft' : 'Add New Aircraft'}
+            </DialogTitle>
+            <DialogContent sx={styles.dialogContent}>
+              <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: '1fr 1fr', mt: 2 }}>
+                <TextField
+                  label="Aircraft Code"
+                  name="aircraftCode"
+                  value={currentAircraft.aircraftCode}
+                  onChange={handleInputChange}
+                  variant="outlined"
+                  fullWidth
+                  sx={styles.searchField}
+                />
+                <TextField
+                  label="Manufacturer"
+                  name="manufacturer"
+                  value={currentAircraft.manufacturer}
+                  onChange={handleInputChange}
+                  variant="outlined"
+                  fullWidth
+                  sx={styles.searchField}
+                />
+                <TextField
+                  label="Model Number"
+                  name="model"
+                  value={currentAircraft.model}
+                  onChange={handleInputChange}
+                  variant="outlined"
+                  fullWidth
+                  sx={styles.searchField}
+                />
+                <TextField
+                  label="Business Capacity"
+                  name="businessCapacity"
+                  type="number"
+                  value={currentAircraft.businessCapacity}
+                  onChange={handleInputChange}
+                  variant="outlined"
+                  fullWidth
+                  sx={styles.searchField}
+                />
+                <TextField
+                  label="Economy Capacity"
+                  name="economyCapacity"
+                  type="number"
+                  value={currentAircraft.economyCapacity}
+                  onChange={handleInputChange}
+                  variant="outlined"
+                  fullWidth
+                  sx={styles.searchField}
+                />
+              </Box>
+            </DialogContent>
+            <DialogActions sx={{ p: 3 }}>
+              <Button
+                onClick={handleCloseDialog}
+                variant="outlined"
+                sx={{
+                  ...styles.actionButton,
+                  borderColor: '#1976d2',
+                  color: '#1976d2',
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveAircraft}
+                variant="contained"
+                disabled={isLoading.saving || !currentAircraft.aircraftCode || !currentAircraft.manufacturer || !currentAircraft.model || !currentAircraft.economyCapacity || !currentAircraft.businessCapacity}
+                sx={{
+                  ...styles.actionButton,
+                  background: 'linear-gradient(90deg, #2196f3 0%, #1976d2 100%)',
+                  '&:hover': {
+                    background: 'linear-gradient(90deg, #1976d2 0%, #1565c0 100%)',
+                  },
+                }}
+              >
+                {isLoading.saving ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : isEditing ? (
+                  'Update Aircraft'
+                ) : (
+                  'Add Aircraft'
+                )}
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          {/* Snackbar */}
+          <Snackbar
+            open={snackbar.open}
+            autoHideDuration={6000}
+            onClose={handleCloseSnackbar}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          >
+            <Alert
+              onClose={handleCloseSnackbar}
+              severity={snackbar.severity}
+              elevation={6}
+              variant="filled"
+              sx={{ 
+                width: '100%',
+                borderRadius: '12px',
+              }}
+            >
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
         </>
       )}
-
-      {/* Dialog for Add/Edit Aircraft */}
-      <Dialog 
-        open={open} 
-        onClose={handleCloseDialog} 
-        maxWidth="md" 
-        fullWidth
-      >
-        <DialogTitle>
-          {isEditing ? 'Edit Aircraft' : 'Add New Aircraft'}
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: '1fr 1fr', mt: 1 }}>
-            <TextField
-              margin="dense"
-              name="aircraftCode"
-              label="Aircraft Code"
-              fullWidth
-              variant="outlined"
-              value={currentAircraft.aircraftCode}
-              onChange={handleInputChange}
-              disabled={isLoading.saving}
-            />
-            <TextField
-              margin="dense"
-              name="manufacturer"
-              label="Manufacturer"
-              fullWidth
-              variant="outlined"
-              value={currentAircraft.manufacturer}
-              onChange={handleInputChange}
-              disabled={isLoading.saving}
-            />
-            <TextField
-              margin="dense"
-              name="model"
-              label="Model Number"
-              fullWidth
-              variant="outlined"
-              value={currentAircraft.model}
-              onChange={handleInputChange}
-              disabled={isLoading.saving}
-            />
-            <TextField
-              margin="dense"
-              name="businessCapacity"
-              label="Business Capacity"
-              type="number"
-              fullWidth
-              variant="outlined"
-              value={currentAircraft.businessCapacity}
-              onChange={handleInputChange}
-              disabled={isLoading.saving}
-            />
-            <TextField
-              margin="dense"
-              name="economyCapacity"
-              label="Economy Capacity"
-              type="number"
-              fullWidth
-              variant="outlined"
-              value={currentAircraft.economyCapacity}
-              onChange={handleInputChange}
-              disabled={isLoading.saving}
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button 
-            onClick={handleCloseDialog} 
-            color="secondary"
-            disabled={isLoading.saving}
-          >
-            Cancel
-          </Button>
-          <Button 
-          onClick={handleSaveAircraft} 
-          color="primary" 
-          variant="contained"
-          disabled={isLoading.saving || !currentAircraft.aircraftCode || !currentAircraft.manufacturer || !currentAircraft.model || !currentAircraft.economyCapacity || !currentAircraft.businessCapacity}
-          >
-            {isLoading.saving ? <CircularProgress size={24} color="inherit" /> : (isEditing ? 'Update' : 'Add')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Snackbar for Notifications */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <Alert 
-          onClose={handleCloseSnackbar} 
-          severity={snackbar.severity} 
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };

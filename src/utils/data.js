@@ -1,6 +1,7 @@
 import React from "react";
 import { TbPlaneInflight } from "react-icons/tb";
 import { FaLocationDot, FaRegNewspaper } from "react-icons/fa6";
+import { GrUnorderedList } from "react-icons/gr";
 import { MdFlight } from "react-icons/md";
 export const links = [
   {
@@ -21,6 +22,10 @@ export const links = [
       {
         name: "News",
         icon: <FaRegNewspaper />,
+      },
+      {
+        name: "Bookings",
+        icon: <GrUnorderedList />,
       },
     ],
   },

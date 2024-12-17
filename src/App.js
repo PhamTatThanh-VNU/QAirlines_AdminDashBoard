@@ -4,7 +4,15 @@ import { FiSettings } from "react-icons/fi";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 
 import { Sidebar, ThemeSettings, Navbar, Footer } from "./components";
-import { Location, Login, Flight, Aircraft, NewsManagement } from "./pages";
+import {
+  Location,
+  Login,
+  Flight,
+  Aircraft,
+  NewsManagement,
+  BookingManagement,
+  Dashboard,
+} from "./pages";
 import "./App.css";
 
 import { useStateContext } from "./context/ContextProvider";
@@ -73,11 +81,13 @@ const App = () => {
                   {themeSettings && <ThemeSettings />}
 
                   <Routes>
+                    <Route path="/" element={<Dashboard />} />
                     {/* dashboard  */}
                     <Route path="/locations" element={<Location />} />
                     <Route path="/aircraft" element={<Aircraft />} />
                     <Route path="/flights" element={<Flight />} />
                     <Route path="/news" element={<NewsManagement />} />
+                    <Route path="/bookings" element={<BookingManagement />} />
                   </Routes>
                 </div>
               </div>
@@ -85,8 +95,7 @@ const App = () => {
           ) : (
             <Routes>
               <Route path="/login" element={<Login />} />
-              {/* <Route path="/loginside" element={<LoginSide />} /> */}
-              <Route path="*" element={<Navigate to="/login" />} />
+              <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           )}
         </BrowserRouter>

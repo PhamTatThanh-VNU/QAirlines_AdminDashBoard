@@ -6,24 +6,46 @@ import {
   Snackbar, 
   CircularProgress,
   Alert,
-  Container
+  Container,
+  Chip
 } from "@mui/material";
-import { AccessTime, Cancel, CheckCircle, Edit, Delete} from "@mui/icons-material";
+import { 
+  AccessTime, 
+  Cancel, 
+  CheckCircle, 
+  Edit, 
+  Delete, 
+  Flight as FlightIcon 
+} from "@mui/icons-material";
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { createTheme ,styled, ThemeProvider } from '@mui/material/styles';
-import { blue, red } from '@mui/material/colors';
+import { createTheme, styled, ThemeProvider } from '@mui/material/styles';
+import { blue, teal, grey } from '@mui/material/colors';
 import { AddFlight } from "../components/AddFlight";
 import { getAllFlights, deleteFlight } from "../services/FlightServices";
 
-// Styled Components
+// Custom Styled Components
 const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  backgroundColor: '#f9fafb',
-  borderRadius: theme.spacing(2),
-  boxShadow: '0 8px 15px rgba(0,0,0,0.1)',
-  marginTop: theme.spacing(4)
+  padding: theme.spacing(4),
+  backgroundColor: '#f0f4f8', // Soft blue-grey background
+  borderRadius: theme.spacing(3),
+  boxShadow: '0 12px 24px rgba(0,0,0,0.1)', // Enhanced shadow
+  position: 'relative',
+  overflow: 'hidden',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '10px',
+    background: `linear-gradient(to right, ${teal[500]}, ${blue[500]})`, // Gradient header accent
+  }
 }));
 
+const CustomChip = styled(Chip)(({ theme }) => ({
+  fontWeight: 600,
+  borderRadius: theme.spacing(1.5),
+}));
 
 export default function Flight() {
     const [flights, setFlights] = useState([]);
@@ -67,7 +89,7 @@ export default function Flight() {
         fetchFlights();
     }, []);
 
-    const handleAddFlight = (newFlight) => {
+     const handleAddFlight = (newFlight) => {
         try {
             setFlights((prevFlights) => [
                 ...prevFlights,
@@ -117,36 +139,84 @@ export default function Flight() {
     };
 
     const columns = [    
-        { field: "flightNumber", headerName: "Flight Number", width: 100 },
-        { field: "origin", headerName: "Departure", width: 150 },
-        { field: "destination", headerName: "Destination", width: 150 },
-        { field: "departureTime", headerName: "Departure Date", width: 200 },
-        { field: "arrivalTime", headerName: "Arrival Date", width: 200 },
-        { field: "price", headerName: "Price ($)", width: 120 },
-        { field: "availableBusinessSeats", headerName: "Business Seats", width: 100 },
-        { field: "availableEconomySeats", headerName: "Economy Seats", width: 100 },
+        { 
+            field: "flightNumber", 
+            headerName: "Chuyến Bay", 
+            width: 120,
+            renderCell: (params) => (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <FlightIcon color="primary" />
+                    {params.value}
+                </div>
+            )
+        },
+        { 
+            field: "origin", 
+            headerName: "Điểm Đi", 
+            width: 150 
+        },
+        { 
+            field: "destination", 
+            headerName: "Điểm Đến", 
+            width: 150 
+        },
+        { 
+            field: "departureTime", 
+            headerName: "Khởi Hành", 
+            width: 200 
+        },
+        { 
+            field: "arrivalTime", 
+            headerName: "Hạ Cánh", 
+            width: 200 
+        },
+        { 
+            field: "price", 
+            headerName: "Giá Vé", 
+            width: 120,
+            renderCell: (params) => (
+                <CustomChip 
+                    label={`$${params.value}`} 
+                    color="primary" 
+                    variant="outlined" 
+                    size="small"
+                />
+            )
+        },
         {
-        field: "status", 
-        headerName: "Status", 
-        width: 60,
-        renderCell: (params) => {
-            const status = params.value;
-            let icon;
-            switch(status) {
-                case 'SCHEDULED':
-                    icon = <AccessTime color="primary" />;
-                    break;
-                case 'CANCELLED':
-                    icon = <Cancel color="error" />;
-                    break;
-                case 'COMPLETED':
-                    icon = <CheckCircle color="success" />;
-                    break;
-                default:
-                    icon = null;
+            field: "status", 
+            headerName: "Trạng Thái", 
+            width: 120,
+            renderCell: (params) => {
+                const status = params.value;
+                let chipColor, icon;
+                switch(status) {
+                    case 'SCHEDULED':
+                        chipColor = 'info';
+                        icon = <AccessTime />;
+                        break;
+                    case 'CANCELLED':
+                        chipColor = 'error';
+                        icon = <Cancel />;
+                        break;
+                    case 'COMPLETED':
+                        chipColor = 'success';
+                        icon = <CheckCircle />;
+                        break;
+                    default:
+                        chipColor = 'default';
+                        icon = null;
+                }
+                return (
+                    <CustomChip 
+                        icon={icon} 
+                        label={status} 
+                        color={chipColor} 
+                        size="small" 
+                        variant="outlined"
+                    />
+                );
             }
-            return icon; // Trả về chỉ icon cần thiết cho cột này
-        }
         },
         { field: "aircraft", headerName: "Aircraft", width: 90 },
         {
@@ -179,7 +249,7 @@ export default function Flight() {
         },
     ];
 
-    const rows = flights.map((flight) => ({
+     const rows = flights.map((flight) => ({
         id: flight.flightId,
         flightNumber: flight.flightNumber || 'N/A',
         origin: flight.origin?.airportName || 'Unknown',
@@ -196,65 +266,58 @@ export default function Flight() {
     const theme = createTheme({
         palette: {
             primary: {
-                main: blue[700],
+                main: teal[600],
             },
             secondary: {
-                main: red[600],
+                main: blue[600],
             },
             background: {
-                default: '#f4f6f8',
+                default: grey[100],
                 paper: '#ffffff',
             },
+        },
+        typography: {
+            fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+        },
+        shape: {
+            borderRadius: 12
         },
         components: {
             MuiDataGrid: {
                 styleOverrides: {
                     root: {
                         border: 'none',
-                        borderRadius: 12,
-                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                        '& .MuiDataGrid-cell': {
-                            borderBottom: '1px solid rgba(224, 224, 224, 1)',
-                        },
                         '& .MuiDataGrid-columnHeaders': {
-                            backgroundColor: blue[50],
-                            color: blue[800],
-                            fontWeight: 600,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.5px',
-                            borderBottom: `2px solid ${blue[200]}`,
-                        },
-                        '& .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-cell:focus': {
-                            outline: 'none',
-                        },
-                        '& .MuiDataGrid-row:hover': {
-                            backgroundColor: blue[50],
-                        },
-                        '& .MuiDataGrid-selectedRow': {
-                            backgroundColor: `${blue[100]}!important`,
-                        },
-                    },
-                },
-            },
-        },
+                            backgroundColor: teal[50],
+                            color: teal[800],
+                        }
+                    }
+                }
+            }
+        }
     });
 
     return (
         <Container maxWidth="xl">
             <StyledPaper elevation={3}>
                 <Typography 
-                            variant="h4" 
-                            gutterBottom 
-                            sx={{ 
-                              mb: 3, 
-                              fontWeight: 'bold', 
-                              color: '#2c3e50',
-                              textAlign: 'center'
-                            }}
-                          >
-                            Quản lí chuyến bay
+                    variant="h4" 
+                    gutterBottom 
+                    sx={{ 
+                        mb: 3, 
+                        fontWeight: 'bold', 
+                        color: teal[800],
+                        textAlign: 'center',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 2
+                    }}
+                >
+                    <FlightIcon fontSize="large" /> Quản Lý Chuyến Bay
                 </Typography>        
-            <ThemeProvider theme={theme}>
+                
+               <ThemeProvider theme={theme}>
                 <div style={{ 
                 height: 600, 
                 width: "100%", 
