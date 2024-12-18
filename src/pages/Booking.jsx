@@ -29,13 +29,17 @@ import {
   Check as CheckIcon,
   Close as CloseIcon,
   FlightTakeoff,
+  Delete as DeleteIcon,
+  Filter as FilterListIcon,
   AirplaneTicket,
   NoLuggage
 } from '@mui/icons-material';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { createTheme, ThemeProvider, alpha } from '@mui/material/styles';
 import { blue, teal, grey } from '@mui/material/colors';
 
-import { fetchAllBookings, confirmBooking } from '../services';
+import { fetchAllBookings, confirmBooking,deleteCancelledBookings, handleCancelBooking } from '../services';
 
 const theme = createTheme({
   palette: {
@@ -99,14 +103,19 @@ const theme = createTheme({
 const BookingManagement = () => {
   const [bookings, setBookings] = useState([]);
   const [filteredBookings, setFilteredBookings] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState({
+    fetching: false,
+    deletingCancelled: false,
+    cancelBooking: false,
+    accepting: false
+  });
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [processingBooking, setProcessingBooking] = useState(null);
-
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   useEffect(() => {
     loadBookings();
   }, []);
@@ -127,7 +136,7 @@ const BookingManagement = () => {
 
   const loadBookings = async () => {
     try {
-      setLoading(true);
+      setLoading((prev) => ({ ...prev, fetching: true }));
       setError(null);
       const data = await fetchAllBookings();
       setBookings(data);
@@ -136,19 +145,50 @@ const BookingManagement = () => {
       setError("Không thể tải dữ liệu. Vui lòng thử lại sau.");
       console.error("Error fetching bookings:", error.message);
     } finally {
-      setLoading(false);
+      setLoading((prev) => ({ ...prev, fetching: false }));
     }
   };
 
   const handleConfirmBooking = async (id) => {
     try {
       setProcessingBooking(id);
+      setLoading((prev) => ({ ...prev, accepting: true }));
       await confirmBooking(id);
       await loadBookings();
     } catch (error) {
       console.error("Error confirming booking:", error.message);
     } finally {
       setProcessingBooking(null);
+      setLoading((prev) => ({ ...prev, accepting: false }));
+    }
+  };
+    const cancelBooking = async (id) => {
+    try {
+    setProcessingBooking(id);
+      setLoading((prev) => ({ ...prev, cancelBooking: true }));
+      await handleCancelBooking(id);
+      await loadBookings();
+    } catch (error) {
+      console.error("Error confirming booking:", error.message);
+    } finally {
+      setLoading((prev) => ({ ...prev, cancelBooking: false }));
+    setProcessingBooking(null);
+    }
+  };
+  const handleDelete = async (filter) => {
+    try {
+      if(filter === 'cancelled'){
+        setLoading((prev) => ({ ...prev, deletingCancelled: true }));
+        await deleteCancelledBookings()
+        await loadBookings()
+      }
+      setDeleteDialogOpen(false);
+    } catch (error) {
+      setError("Không thể xóa dữ liệu. Vui lòng thử lại sau.");
+      console.error("Error deleting bookings:", error.message);
+    } finally {
+      setLoading((prev) => ({ ...prev, deletingCancelled: false }));
+      setDeleteDialogOpen(false)
     }
   };
 
@@ -229,28 +269,65 @@ const BookingManagement = () => {
             Quản Lý Đặt Vé
           </Typography>
 
-          <Box sx={{ mb: 3 }}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Tìm kiếm theo tên khách hàng, mã đặt vé hoặc số hiệu chuyến bay..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon color="action" />
-                  </InputAdornment>
-                ),
-                sx: {
-                  borderRadius: 2,
-                  '&:hover': {
-                    backgroundColor: alpha(teal[500], 0.04)
-                  }
-                }
-              }}
-            />
-          </Box>
+            <Box 
+                sx={{ 
+                        mb: 3,
+                        display: 'flex',
+                        flexDirection: { xs: 'column', md: 'row' },
+                        gap: 2,
+                        justifyContent: 'space-between',
+                        alignItems: { xs: 'stretch', md: 'center' }
+                    }}
+                    >
+                    <Box sx={{ flex: 1 }}>
+                        <TextField
+                        fullWidth
+                        variant="outlined"
+                        placeholder="Tìm kiếm theo tên khách hàng, mã đặt vé hoặc số hiệu chuyến bay..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        InputProps={{
+                            startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon color="action" />
+                            </InputAdornment>
+                            ),
+                            sx: {
+                            borderRadius: 2,
+                            '&:hover': {
+                                backgroundColor: alpha(teal[500], 0.04)
+                            }
+                            }
+                        }}
+                        />
+                    </Box>
+                    
+                    <Box 
+                        sx={{ 
+                        display: 'flex',
+                        gap: 1,
+                        justifyContent: { xs: 'flex-end', md: 'flex-end' }
+                        }}
+                    >
+                        <Button
+                        variant="outlined"
+                        color="error"
+                        startIcon={<DeleteIcon />}
+                        onClick={() => setDeleteDialogOpen(true)}
+                        sx={{ 
+                            minWidth: 130,
+                            borderRadius: 2,
+                            borderWidth: 2,
+                            '&:hover': {
+                            borderWidth: 2,
+                            backgroundColor: alpha('#f44336', 0.04)
+                            }
+                        }}
+                        >
+                        Xóa Vé Cũ
+                        </Button>
+                    </Box>
+            </Box>
 
           {error && (
             <Alert 
@@ -262,7 +339,7 @@ const BookingManagement = () => {
             </Alert>
           )}
 
-          {loading ? (
+          {loading.fetching ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
               <CircularProgress />
             </Box>
@@ -344,21 +421,38 @@ const BookingManagement = () => {
                               Chi Tiết
                             </Button>
                             {booking.status === 'PENDING' && (
-                              <Button
-                                variant="contained"
-                                color="success"
-                                size="small"
-                                startIcon={
-                                  processingBooking === booking.bookingId ? 
-                                  <CircularProgress size={20} color="inherit" /> : 
-                                  <CheckIcon />
-                                }
-                                onClick={() => handleConfirmBooking(booking.bookingId)}
-                                disabled={processingBooking === booking.bookingId}
-                              >
-                                Xác Nhận
-                              </Button>
-                            )}
+                                    <>
+                                        <Button
+                                        variant="contained"
+                                        color="success"
+                                        size="small"
+                                        startIcon={
+                                            processingBooking === booking.bookingId && loading.accepting? 
+                                            <CircularProgress size={20} color="inherit" /> : 
+                                            <CheckIcon />
+                                        }
+                                        onClick={() => handleConfirmBooking(booking.bookingId)}
+                                        disabled={processingBooking === booking.bookingId && loading.accepting}
+                                        >
+                                        Xác Nhận
+                                        </Button>
+
+                                        <Button
+                                        variant="contained"
+                                        color="error"
+                                        size="small"
+                                        startIcon={  processingBooking === booking.bookingId && loading.cancelBooking ? 
+                                            <CircularProgress size={20} color="inherit" /> : 
+                                            <CancelIcon />
+                                        }
+                                        onClick={() => cancelBooking(booking.bookingId)}
+                                        disabled={processingBooking === booking.bookingId && loading.cancelBooking}
+                                        style={{ marginLeft: 8 }} // Để các nút cách nhau một chút
+                                        >
+                                        Hủy Vé
+                                        </Button>
+                                    </>
+                                    )}
                           </Box>
                         </TableCell>
                       </TableRow>
@@ -443,6 +537,14 @@ const BookingManagement = () => {
               </DialogContent>
               <DialogActions sx={{ backgroundColor: alpha(teal[500], 0.1), p: 2 }}>
                 <Button
+                         onClick={() => window.location.href = `http://localhost:8080/pdf/${selectedBooking.pdfs}`}
+                        color="primary"
+                        variant="contained"
+                        startIcon={<PictureAsPdfIcon />}
+                >
+                        Xem PDF
+                </Button>
+                <Button
                   onClick={() => setSelectedBooking(null)}
                   color="primary"
                   variant="outlined"
@@ -453,6 +555,55 @@ const BookingManagement = () => {
               </DialogActions>
             </>
           )}
+        </Dialog>
+        <Dialog
+            open={deleteDialogOpen}
+            onClose={() => setDeleteDialogOpen(false)}
+            maxWidth="xs"
+            fullWidth
+            PaperProps={{
+            sx: {
+                borderRadius: 3,
+                overflow: 'hidden'
+            }
+            }}
+        >
+    <DialogTitle 
+      sx={{ 
+        backgroundColor: alpha(teal[500], 0.1),
+        color: teal[800],
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2
+      }}
+    >
+      <FilterListIcon />
+      Tùy Chọn Xóa Vé
+    </DialogTitle>
+    <DialogContent sx={{ mt: 2 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Button
+          fullWidth
+          variant="outlined"
+          color="error"
+          onClick={() => handleDelete('cancelled')}
+          startIcon={loading.deletingCancelled ? <CircularProgress size={24} /> : <DeleteIcon />} 
+          disabled = {loading.deletingCancelled}
+        >
+            {loading.deletingCancelled ? "Đang Xóa..." : "Xóa Vé Đã Hủy"} 
+        </Button>
+      </Box>
+    </DialogContent>
+    <DialogActions sx={{ backgroundColor: alpha(teal[500], 0.1), p: 2 }}>
+      <Button
+        onClick={() => setDeleteDialogOpen(false)}
+        color="primary"
+        variant="contained"
+        startIcon={<CloseIcon />}
+      >
+        Đóng
+      </Button>
+        </DialogActions>
         </Dialog>
       </Box>
     </ThemeProvider>
