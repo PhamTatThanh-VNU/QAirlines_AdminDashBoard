@@ -1,109 +1,116 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Button, 
-  Dialog, 
-  DialogActions, 
-  DialogContent, 
-  DialogTitle, 
-  IconButton, 
-  Paper, 
-  Snackbar, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  TextField, 
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Paper,
+  Snackbar,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
   Typography,
   Alert,
   CircularProgress,
   TablePagination,
   InputAdornment,
-  useTheme
 } from '@mui/material';
-import { 
-  Add as AddIcon, 
-  Edit as EditIcon, 
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
   Delete as DeleteIcon,
-  Flight as FlightIcon 
+  Flight as FlightIcon
 } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
-import { 
-  getAllAirCrafts, 
-  addAirCraft, 
-  updateAirCraft, 
-  deleteAirCraft 
+import {
+  getAllAirCrafts,
+  addAirCraft,
+  updateAirCraft,
+  deleteAirCraft
 } from '../services';
+import styles from './CSS/Style';
 
-// Custom styles
-const styles = {
-  gradientBackground: {
-    background: 'linear-gradient(120deg, #1a237e 0%, #0d47a1 100%)',
-    color: '#ffffff',
-    borderRadius: '16px',
-    padding: '24px',
-    marginBottom: '24px',
-  },
-  tableContainer: {
-    background: '#ffffff',
-    borderRadius: '16px',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-    overflow: 'hidden',
-  },
-  tableHeader: {
-    background: 'linear-gradient(90deg, #1e88e5 0%, #1976d2 100%)',
-    '& .MuiTableCell-head': {
-      color: '#ffffff',
-      fontWeight: 'bold',
-      fontSize: '1rem',
-    },
-  },
-  actionButton: {
-    borderRadius: '12px',
-    textTransform: 'none',
-    padding: '8px 24px',
-    fontWeight: 'bold',
-    transition: 'all 0.3s ease',
-  },
-  searchField: {
-    background: '#ffffff',
-    borderRadius: '12px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-    '& .MuiOutlinedInput-root': {
-      '& fieldset': {
-        borderColor: 'transparent',
-      },
-      '&:hover fieldset': {
-        borderColor: '#1976d2',
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: '#1976d2',
-      },
-    },
-  },
-  dialogTitle: {
-    background: 'linear-gradient(90deg, #1e88e5 0%, #1976d2 100%)',
-    color: '#ffffff',
-    padding: '16px 24px',
-  },
-  dialogContent: {
-    padding: '24px',
-  },
-  tableRow: {
-    '&:hover': {
-      background: 'rgba(25, 118, 210, 0.08)',
-    },
-  },
-  iconButton: {
-    borderRadius: '12px',
-    padding: '8px',
-    '&:hover': {
-      background: 'rgba(25, 118, 210, 0.1)',
-    },
-  },
-};
+// const styles = {
+//   gradientBackground: {
+//     background: 'rgba(108, 204, 171, 0.67)', // Sử dụng màu xanh lam nhạt làm gradient
+//     color: '#ffffff',
+//     borderRadius: '10px',
+//     padding: '24px',
+//     marginBottom: '24px',
+//   },
+//   tableContainer: {
+//     background: '#ffffff',
+//     borderRadius: '10px',
+//     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+//     overflow: 'hidden',
+//   },
+//   tableHeader: {
+//     background: 'rgba(108, 204, 171, 0.67)', // Gradient nhẹ nhàng hơn với các sắc độ của màu chủ đề
+//     '& .MuiTableCell-head': {
+//       color: '#ffffff',
+//       fontWeight: 'bold',
+//       fontSize: '1rem',
+//     },
+//   },
+//   actionButton: {
+//     borderRadius: '5px',
+//     textTransform: 'uppercase',
+//     padding: '8px 24px',
+//     fontWeight: 'bold',
+//     boxShadow: 'none',
+//     transition: 'all 0.3s ease',
+//     backgroundColor: '#8DD3BA',
+//     '&:hover': {
+//       backgroundColor: '#7BC4A7',
+//     },
+//   },
+//   searchField: {
+//     background: 'whitesmoke',
+//     border: '1px solid #e0e0e0',
+//     borderRadius: '5px',
+//     '& .MuiOutlinedInput-root': {
+//       '& fieldset': {
+//         borderColor: 'transparent',
+//       },
+//       '&:hover fieldset': {
+//         borderColor: '#7BC4A7', // Màu nhạt hơn khi hover
+//       },
+//       '&.Mui-focused fieldset': {
+//         borderColor: '#7BC4A7', // Màu khi focused
+//       },
+//     },
+//   },
+//   searchIcon: {
+//     color: 'rgba(0, 0, 0, 0.54)',
+//   },
+//   dialogTitle: {
+//     background: 'rgba(108, 204, 171, 0.67)', // Sử dụng gradient cho dialog title
+//     color: '#ffffff',
+//     padding: '16px 24px',
+//   },
+//   dialogContent: {
+//     padding: '24px',
+//   },
+//   tableRow: {
+//     '&:hover': {
+//       background: 'rgba(142, 211, 186, 0.1)', // Màu nhạt của chủ đề khi hover trên table row
+//     },
+//   },
+//   iconButton: {
+//     borderRadius: '50%',
+//     padding: '8px',
+//     '&:hover': {
+//       background: 'rgba(118, 128, 124, 0.2)', // Background nhẹ khi hover
+//     },
+//   },
+// };
 
 const Aircraft = () => {
   // State for aircraft data and management
@@ -115,7 +122,7 @@ const Aircraft = () => {
     manufacturer: '',
     model: '',
     businessCapacity: '',
-    economyCapacity:''
+    economyCapacity: ''
   });
   const [isEditing, setIsEditing] = useState(false);
 
@@ -196,7 +203,7 @@ const Aircraft = () => {
         manufacturer: '',
         model: '',
         economyCapacity: '',
-        businessCapacity:''
+        businessCapacity: ''
       });
       setIsEditing(false);
     }
@@ -229,8 +236,8 @@ const Aircraft = () => {
       if (isEditing) {
         // Update existing aircraft
         const updatedAircraft = await updateAirCraft(currentAircraft.id, currentAircraft);
-        setAircrafts(prev => 
-          prev.map(aircraft => 
+        setAircrafts(prev =>
+          prev.map(aircraft =>
             aircraft.id === currentAircraft.id ? updatedAircraft : aircraft
           )
         );
@@ -251,10 +258,10 @@ const Aircraft = () => {
 
   // Delete aircraft
   const handleDeleteAircraft = async (id) => {
-    setIsLoading(prev => ({ 
-      ...prev, 
+    setIsLoading(prev => ({
+      ...prev,
       deleting: true,
-      deletingId: id 
+      deletingId: id
     }));
     try {
       await deleteAirCraft(id);
@@ -263,10 +270,10 @@ const Aircraft = () => {
     } catch (error) {
       handleError(error.message);
     } finally {
-      setIsLoading(prev => ({ 
-        ...prev, 
+      setIsLoading(prev => ({
+        ...prev,
         deleting: false,
-        deletingId: null 
+        deletingId: null
       }));
     }
   };
@@ -285,41 +292,41 @@ const Aircraft = () => {
       ) : (
         <>
           {/* Header Section */}
-          <Box 
-            sx={{ 
-              ...styles.gradientBackground, 
-              display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              textAlign: 'center' // Căn giữa văn bản
+          <Box
+            sx={{
+              ...styles.boxBackground,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <FlightIcon sx={{ fontSize: 40, mr: 2 }} />
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                Quản lí tàu bay
+              <FlightIcon sx={{ fontSize: 40, mr: 2, color: 'white' }} />
+              <Typography variant="h4" sx={{ fontWeight: 'bold !important' }}>
+                Aircraft Management
               </Typography>
             </Box>
-            <Typography variant="subtitle1" sx={{ opacity: 0.8 }}>
-              Quản lí phương tiện dễ dàng và hiệu quả hơn
+            <Typography variant="subtitle1" sx={{ opacity: 0.8, textAlign: 'center' }}>
+              More efficient and easier vehicle management
             </Typography>
           </Box>
 
 
           {/* Search and Add Section */}
-          <Box 
-            sx={{ 
-              display: 'flex', 
-              gap: 2, 
-              mb: 3, 
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 2,
+              mb: 3,
               flexWrap: 'wrap',
               alignItems: 'center',
               justifyContent: 'space-between'
             }}
           >
             <TextField
-              placeholder="Search aircraft..."
+              placeholder="Search aircraft code..."
               variant="outlined"
               size="medium"
               value={searchAircraftCode}
@@ -327,7 +334,7 @@ const Aircraft = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon color="primary" />
+                    <SearchIcon sx={{ ...styles.searchIcon }} />
                   </InputAdornment>
                 ),
               }}
@@ -339,10 +346,6 @@ const Aircraft = () => {
               onClick={() => handleOpenDialog()}
               sx={{
                 ...styles.actionButton,
-                background: 'linear-gradient(90deg, #2196f3 0%, #1976d2 100%)',
-                '&:hover': {
-                  background: 'linear-gradient(90deg, #1976d2 0%, #1565c0 100%)',
-                },
               }}
             >
               Add New Aircraft
@@ -421,8 +424,8 @@ const Aircraft = () => {
           </TableContainer>
 
           {/* Dialog */}
-          <Dialog 
-            open={open} 
+          <Dialog
+            open={open}
             onClose={handleCloseDialog}
             maxWidth="md"
             fullWidth
@@ -493,8 +496,13 @@ const Aircraft = () => {
                 variant="outlined"
                 sx={{
                   ...styles.actionButton,
-                  borderColor: '#1976d2',
-                  color: '#1976d2',
+                  color: '#ffffff',
+                  border: 'none',
+                  background: 'rgba(241, 116, 116, 0.84)',
+                  '&:hover': {
+                    background: 'rgba(197, 32, 32, 0.87)',
+                    boxShadow: 'none',
+                  },
                 }}
               >
                 Cancel
@@ -505,10 +513,6 @@ const Aircraft = () => {
                 disabled={isLoading.saving || !currentAircraft.aircraftCode || !currentAircraft.manufacturer || !currentAircraft.model || !currentAircraft.economyCapacity || !currentAircraft.businessCapacity}
                 sx={{
                   ...styles.actionButton,
-                  background: 'linear-gradient(90deg, #2196f3 0%, #1976d2 100%)',
-                  '&:hover': {
-                    background: 'linear-gradient(90deg, #1976d2 0%, #1565c0 100%)',
-                  },
                 }}
               >
                 {isLoading.saving ? (
@@ -534,7 +538,7 @@ const Aircraft = () => {
               severity={snackbar.severity}
               elevation={6}
               variant="filled"
-              sx={{ 
+              sx={{
                 width: '100%',
                 borderRadius: '12px',
               }}

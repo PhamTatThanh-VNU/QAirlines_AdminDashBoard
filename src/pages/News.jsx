@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Container, 
-  Typography, 
-  Box, 
-  Paper, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  Button, 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  TextField, 
+import {
+  Container,
+  Typography,
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
   InputAdornment,
   IconButton,
   Grid,
@@ -27,25 +27,26 @@ import {
   alpha,
   useTheme
 } from '@mui/material';
-import { 
-  Add as AddIcon, 
-  Edit as EditIcon, 
-  Delete as DeleteIcon, 
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
   Search as SearchIcon,
   CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { 
-  fetchAllNews, 
-  createNews, 
-  updateNews, 
+import {
+  fetchAllNews,
+  createNews,
+  updateNews,
   deleteNews,
   acceptNews
 } from '../services';
 import PublishIcon from '@mui/icons-material/Publish';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import './CSS/CustomQuillEditor.css';
+import styles from './CSS/Style';
 
 // Styled Components
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -70,12 +71,14 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   '& .MuiTableHead-root': {
     '& .MuiTableCell-root': {
       border: 'none',
-      color: theme.palette.primary.main,
+      color: '#ffffff',
+      background: 'rgba(108, 204, 171, 0.67)',
       fontWeight: 600,
       fontSize: '0.9rem',
       textTransform: 'uppercase',
       letterSpacing: '0.5px',
       padding: theme.spacing(2),
+      textAlign: 'center',
     }
   },
   '& .MuiTableBody-root': {
@@ -83,7 +86,7 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
       backgroundColor: alpha(theme.palette.background.paper, 0.8),
       transition: 'all 0.3s ease',
       '&:hover': {
-        backgroundColor: alpha(theme.palette.primary.main, 0.05),
+        backgroundColor: 'rgba(142, 211, 186, 0.1)',
         transform: 'scale(1.01)',
       },
       '& .MuiTableCell-root': {
@@ -103,34 +106,33 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  borderRadius: '12px',
-  padding: '8px 24px',
-  textTransform: 'none',
-  fontWeight: 600,
-  boxShadow: `0 4px 14px 0 ${alpha(theme.palette.primary.main, 0.25)}`,
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: `0 6px 20px 0 ${alpha(theme.palette.primary.main, 0.35)}`,
-  }
+  sx: styles.actionButton,
+  // borderRadius: '12px',
+  // padding: '8px 24px',
+  // textTransform: 'none',
+  // fontWeight: 600,
+  // // boxShadow: `0 4px 14px 0 ${alpha(theme.palette.primary.main, 0.25)}`,
+  // transition: 'all 0.3s ease',
+  // '&:hover': {
+  //   transform: 'translateY(-2px)',
+  //   // boxShadow: `0 6px 20px 0 ${alpha(theme.palette.primary.main, 0.35)}`,
+  // }
 }));
 
 const StyledSearchField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
-    borderRadius: '12px',
+    borderRadius: '5px',
     transition: 'all 0.3s ease',
-    backgroundColor: alpha(theme.palette.background.paper, 0.8),
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.background.paper, 0.95),
-    },
+    backgroundColor: 'whitesmoke',
+    border: '1px solid #e0e0e0',
     '& fieldset': {
       borderColor: 'transparent',
     },
     '&:hover fieldset': {
-      borderColor: alpha(theme.palette.primary.main, 0.2),
+      borderColor: '#7BC4A7',
     },
     '&.Mui-focused fieldset': {
-      borderColor: theme.palette.primary.main,
+      borderColor: '#7BC4A7',
     }
   }
 }));
@@ -140,7 +142,6 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
   padding: '8px',
   transition: 'all 0.3s ease',
   '&:hover': {
-    backgroundColor: alpha(theme.palette.action.hover, 0.15),
     transform: 'scale(1.1)',
   }
 }));
@@ -148,7 +149,7 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialog-paper': {
     borderRadius: '16px',
-    padding: theme.spacing(2),
+    // padding: theme.spacing(2),
     background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.95)}, ${alpha(theme.palette.background.paper, 0.98)})`,
     backdropFilter: 'blur(10px)',
   }
@@ -157,17 +158,18 @@ const StyledDialog = styled(Dialog)(({ theme }) => ({
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   fontSize: '1.5rem',
   fontWeight: 600,
-  color: theme.palette.primary.main,
   borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-  paddingBottom: theme.spacing(2),
+  background: 'rgba(108, 204, 171, 0.67)',
+  color: '#ffffff',
+  padding: '16px',
 }));
 
 const NewsManagement = () => {
   const [isLoading, setIsLoading] = useState({
-      fetching: false,
-      saving: false,
-      deleting: false,
-      accepting: false
+    fetching: false,
+    saving: false,
+    deleting: false,
+    accepting: false
   });
   const [news, setNews] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -188,12 +190,12 @@ const NewsManagement = () => {
 
   // Quill Modules Configuration
   const quillModules = {
-    toolbar: [     
+    toolbar: [
       [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
       [{ 'size': ['small', 'medium', 'large', 'huge'] }],
       ['bold', 'italic', 'underline', 'strike'],
-      [{ 'color': []}, { 'background': [] }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
       [{ 'align': [] }],
       ['blockquote', 'code-block'],
       ['clean']
@@ -207,8 +209,8 @@ const NewsManagement = () => {
       const data = await fetchAllNews();
       setNews(data);
     } catch (error) {
-      handleSnackbarOpen('Không thể tải tin tức', 'error');
-    } finally{
+      handleSnackbarOpen('Can not load news.', 'error');
+    } finally {
       setIsLoading((prev) => ({ ...prev, fetching: false }));
     }
   }, []);
@@ -247,7 +249,7 @@ const NewsManagement = () => {
   // News CRUD Operations
   const handleSaveNews = async () => {
     if (!currentNews.title.trim()) {
-      handleSnackbarOpen('Tiêu đề không được để trống', 'error');
+      handleSnackbarOpen('Title can not be blank. ', 'error');
       return;
     }
 
@@ -258,18 +260,18 @@ const NewsManagement = () => {
           title: currentNews.title,
           content: currentNews.content
         });
-        handleSnackbarOpen('Cập nhật tin tức thành công');
+        handleSnackbarOpen('News update successful.');
       } else {
         await createNews({
           title: currentNews.title,
           content: currentNews.content
         });
-        handleSnackbarOpen('Tạo tin tức mới thành công');
+        handleSnackbarOpen('News added successfully.');
       }
       loadNews();
       handleCloseDialog();
     } catch (error) {
-      handleSnackbarOpen('Lỗi khi lưu tin tức', 'error');
+      handleSnackbarOpen('Error saving news.', 'error');
     } finally {
       setIsLoading((prev) => ({ ...prev, saving: false }));
     }
@@ -288,10 +290,10 @@ const NewsManagement = () => {
       setIsLoading((prev) => ({ ...prev, deleting: true }));
       await deleteNews(deleteId);
       loadNews();
-      handleSnackbarOpen('Xóa tin tức thành công');
+      handleSnackbarOpen('News deleted successfully.');
       setOpenConfirmDialog(false);
     } catch (error) {
-      handleSnackbarOpen('Không thể xóa tin tức', 'error');
+      handleSnackbarOpen('Cannot delete news.', 'error');
     } finally {
       setIsLoading((prev) => ({ ...prev, deleting: false }));
     }
@@ -303,16 +305,16 @@ const NewsManagement = () => {
       setIsLoading((prev) => ({ ...prev, accepting: true }));
       await acceptNews(id);
       loadNews();
-      handleSnackbarOpen('Chấp nhận tin tức thành công');
+      handleSnackbarOpen('Accepted news successfully.');
     } catch (error) {
-      handleSnackbarOpen('Không thể chấp nhận tin tức', 'error');
+      handleSnackbarOpen('Cannot accept news.', 'error');
     } finally {
       setIsLoading((prev) => ({ ...prev, accepting: false }));
     }
   };
 
   // Filtering News
-  const filteredNews = news.filter(item => 
+  const filteredNews = news.filter(item =>
     item.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -325,42 +327,43 @@ const NewsManagement = () => {
       <StyledPaper>
         <Grid container alignItems="center" justifyContent="space-between" sx={{ mb: 4 }}>
           <Grid item>
-            <Typography 
-              variant="h4" 
-              component="h1" 
-              sx={{ 
+            <Typography
+              variant="h4"
+              component="h1"
+              sx={{
                 fontWeight: 700,
                 background: '-webkit-linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              Quản lý Tin tức
+              News Management
             </Typography>
           </Grid>
           <Grid item sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <StyledSearchField
               variant="outlined"
-              placeholder="Tìm kiếm tin tức..."
+              placeholder="Search news..."
               size="small"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon color="primary" />
+                    <SearchIcon sx={{ ...styles.searchIcon, paddingRight: '8px', fontSize: '24px' }} />
                   </InputAdornment>
                 )
               }}
             />
-            <StyledButton 
-              variant="contained" 
-              color="primary" 
+            <StyledButton
+              variant="contained"
+              color="primary"
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog()}
               disabled={isLoading.saving}
+              sx={styles.actionButton}
             >
-              Thêm Tin tức
+              Add News
             </StyledButton>
           </Grid>
         </Grid>
@@ -368,19 +371,19 @@ const NewsManagement = () => {
         <StyledTableContainer>
           <Table>
             <TableHead>
-              <TableRow>              
-                <TableCell>Tiêu đề</TableCell>
-                <TableCell>Ngày tạo</TableCell>
-                <TableCell>Trạng Thái</TableCell>
-                <TableCell align="right">Thao tác</TableCell>
+              <TableRow>
+                <TableCell>Title</TableCell>
+                <TableCell>Created At</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell align="right">Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredNews.map((newsItem) => (
-                <TableRow key={newsItem.id}>                  
+                <TableRow key={newsItem.id}>
                   <TableCell sx={{ fontWeight: 500 }}>{newsItem.title}</TableCell>
                   <TableCell>
-                    {new Date(newsItem.createdAt).toLocaleDateString('vi-VN', {
+                    {new Date(newsItem.createdAt).toLocaleDateString('en-EN', {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric'
@@ -391,14 +394,14 @@ const NewsManagement = () => {
                       <Box display="flex" alignItems="center" gap={1}>
                         <CheckCircleIcon color="success" />
                         <Typography variant="body2" color="success.main">
-                          Đã xuất bản
+                          Published
                         </Typography>
                       </Box>
                     ) : (
                       <Box display="flex" alignItems="center" gap={1}>
                         <DraftsIcon color="primary" />
                         <Typography variant="body2" color="primary">
-                          Bản nháp
+                          Draft
                         </Typography>
                       </Box>
                     )}
@@ -406,7 +409,7 @@ const NewsManagement = () => {
                   <TableCell align="right">
                     <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
                       {newsItem.status === "DRAFT" && (
-                        <Tooltip title="Xuất bản">
+                        <Tooltip title="Publish">
                           <StyledIconButton
                             color="success"
                             onClick={() => handleAcceptNews(newsItem.id)}
@@ -420,18 +423,18 @@ const NewsManagement = () => {
                           </StyledIconButton>
                         </Tooltip>
                       )}
-                      <Tooltip title="Chỉnh sửa">
-                        <StyledIconButton 
-                          color="primary" 
+                      <Tooltip title="Edit">
+                        <StyledIconButton
+                          color="primary"
                           onClick={() => handleOpenDialog(newsItem)}
                           disabled={isLoading.saving}
                         >
                           <EditIcon />
                         </StyledIconButton>
                       </Tooltip>
-                      <Tooltip title="Xóa">
-                        <StyledIconButton 
-                          color="error" 
+                      <Tooltip title="Delete">
+                        <StyledIconButton
+                          color="error"
                           onClick={() => handleDeleteConfirmation(newsItem.id)}
                           disabled={isLoading.deleting}
                         >
@@ -452,44 +455,44 @@ const NewsManagement = () => {
       </StyledPaper>
 
       {/* News Edit/Create Dialog */}
-      <StyledDialog 
-        open={openDialog} 
+      <StyledDialog
+        open={openDialog}
         onClose={handleCloseDialog}
         maxWidth="md"
         fullWidth
       >
-        <StyledDialogTitle>
-          {isEditing ? 'Chỉnh sửa Tin tức' : 'Thêm Tin tức Mới'}
+        <StyledDialogTitle >
+          {isEditing ? 'Edit News' : 'Add News'}
         </StyledDialogTitle>
         <DialogContent>
           <Box sx={{ mt: 3 }}>
             <TextField
               fullWidth
-              label="Tiêu đề"
+              label="Title"
               variant="outlined"
               value={currentNews.title}
               onChange={(e) => setCurrentNews(prev => ({
-                ...prev, 
+                ...prev,
                 title: e.target.value
               }))}
-              sx={{ 
+              sx={{
                 mb: 3,
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '12px',
                 }
               }}
               required
-            />        
+            />
             <ReactQuill
               theme="snow"
               value={currentNews.content}
               onChange={(content) => setCurrentNews(prev => ({
-                ...prev, 
+                ...prev,
                 content
               }))}
               modules={quillModules}
-              style={{ 
-                height: '300px', 
+              style={{
+                height: '300px',
                 marginBottom: '50px',
                 borderRadius: '12px',
                 overflow: 'hidden'
@@ -498,25 +501,27 @@ const NewsManagement = () => {
           </Box>
         </DialogContent>
         <DialogActions sx={{ padding: 2, gap: 1 }}>
-          <StyledButton 
-            onClick={handleCloseDialog} 
+          <StyledButton
+            onClick={handleCloseDialog}
             color="inherit"
             variant="outlined"
+            sx={styles.cancelButton}
           >
-            Hủy
+            Cancel
           </StyledButton>
-          <StyledButton 
-            onClick={handleSaveNews} 
-            variant="contained" 
+          <StyledButton
+            onClick={handleSaveNews}
+            variant="contained"
             color="primary"
             disabled={isLoading.saving}
+            sx={styles.actionButton}
           >
             {isLoading.saving ? (
               <CircularProgress size={24} color="inherit" />
             ) : isEditing ? (
-              "Lưu thay đổi"
+              "Save Changes"
             ) : (
-              "Tạo tin tức"
+              "Add News"
             )}
           </StyledButton>
         </DialogActions>
@@ -527,46 +532,48 @@ const NewsManagement = () => {
         open={openConfirmDialog}
         onClose={() => setOpenConfirmDialog(false)}
       >
-        <StyledDialogTitle>Xác nhận xóa</StyledDialogTitle>
+        <StyledDialogTitle>Confirm Delete</StyledDialogTitle>
         <DialogContent>
           <Typography variant="body1" sx={{ mt: 2 }}>
-            Bạn có chắc chắn muốn xóa tin tức này? Hành động này không thể hoàn tác.
+            Are you sure you want to delete this news? This action cannot be undone.
           </Typography>
         </DialogContent>
         <DialogActions sx={{ padding: 2, gap: 1 }}>
-          <StyledButton 
-            onClick={() => setOpenConfirmDialog(false)} 
+          <StyledButton
+            onClick={() => setOpenConfirmDialog(false)}
             color="inherit"
             variant="outlined"
+            sx={styles.normalButton}
           >
-            Hủy
+            Cancel
           </StyledButton>
-          <StyledButton 
-            onClick={handleDeleteNews} 
-            variant="contained" 
-            color="error"
+          <StyledButton
+            onClick={handleDeleteNews}
+            variant="contained"
+            // color="error"
             disabled={isLoading.deleting}
+            sx={{ ...styles.cancelButton, backgroundColor: '#f44336' }}
           >
             {isLoading.deleting ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
-              "Xóa"
+              "Delete"
             )}
           </StyledButton>
         </DialogActions>
       </StyledDialog>
 
       {/* Snackbar */}
-      <Snackbar 
+      <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity={snackbar.severity} 
-          sx={{ 
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{
             width: '100%',
             borderRadius: '12px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',

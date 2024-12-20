@@ -31,8 +31,10 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Add as AddIcon,
-  Search as SearchIcon
+  Search as SearchIcon,
+  Place as PlaceIcon
 } from "@mui/icons-material";
+import styles from './CSS/Style';
 
 export default function Location() {
   const [locations, setLocations] = useState([]);
@@ -159,31 +161,34 @@ export default function Location() {
 
   return (
     <Box sx={{ width: "100%", p: 2 }}>
-          <Typography 
-            variant="h4" 
-            gutterBottom 
-            sx={{ 
-              mb: 3, 
-              fontWeight: 'bold', 
-              color: '#2c3e50',
-              textAlign: 'center'
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', ...styles.boxBackground }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <PlaceIcon sx={{ fontSize: 40, mr: 2, color: 'white' }} />
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 'bold',
+              textAlign: 'center',
             }}
           >
-            Quản lí vị trí các sân bay 
+            Location Management
           </Typography>
+        </Box>
+      </Box>
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: 2
+          mb: 3,
+          gap: 2,
+          flexWrap: 'wrap'
         }}
       >
-        
         <TextField
           placeholder="Search Locations"
           variant="outlined"
-          size="small"
+          size="medium"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           InputProps={{
@@ -193,13 +198,14 @@ export default function Location() {
               </InputAdornment>
             )
           }}
-          sx={{ flexGrow: 1, mr: 2 }}
+          sx={{ ...styles.searchField, flexGrow: 1, mr: 2, maxWidth: '500px' }}
         />
         <Button
           variant="contained"
           color="primary"
           startIcon={<AddIcon />}
           onClick={() => handleOpenDialog()}
+          sx={styles.actionButton}
         >
           Add Location
         </Button>
@@ -210,9 +216,9 @@ export default function Location() {
           <CircularProgress />
         </Box>
       ) : (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={styles.tableContainer}>
           <Table sx={{ minWidth: 650 }}>
-            <TableHead>
+            <TableHead sx={styles.tableHeader}>
               <TableRow>
                 <TableCell>Code</TableCell>
                 <TableCell>Location Name</TableCell>
@@ -225,7 +231,8 @@ export default function Location() {
                 <TableRow
                   key={location.code}
                   hover
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  sx={styles.tableRow}
+                // sx={{ "&:last-child td, &:last-child th": { border: 0 }, ...styles.tableRow }}
                 >
                   <TableCell>{location.code}</TableCell>
                   <TableCell>{location.locationName}</TableCell>
@@ -242,6 +249,7 @@ export default function Location() {
                       color="error"
                       onClick={() => handleDeleteLocation(location.id)}
                       disabled={isLoading.deleting || isLoading.fetching}
+                      sx={{ ...styles.iconButton, color: '#d32f2f', ml: 1 }}
                     >
                       {isLoading.deleting && isLoading.deletingId === location.id ? (
                         <CircularProgress size={24} color="inherit" />
@@ -257,9 +265,22 @@ export default function Location() {
         </TableContainer>
       )}
 
-      <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-        <DialogTitle>{isEditing ? "Edit Location" : "Add Location"}</DialogTitle>
-        <DialogContent>
+      <Dialog
+        open={open}
+        onClose={handleCloseDialog}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          sx: {
+            borderRadius: '16px',
+            overflow: 'hidden',
+          },
+        }}
+      >
+        <DialogTitle sx={styles.dialogTitle}>
+          {isEditing ? "Edit Location" : "Add Location"}
+        </DialogTitle>
+        <DialogContent sx={{ ...styles.dialogContent, mt: 2 }}>
           <TextField
             autoFocus
             margin="dense"
@@ -271,6 +292,7 @@ export default function Location() {
             onChange={handleInputChange}
             error={!!errorMessage}
             helperText={errorMessage && "This field is required"}
+            sx={styles.searchField}
           />
           <TextField
             margin="dense"
@@ -282,6 +304,7 @@ export default function Location() {
             onChange={handleInputChange}
             error={!!errorMessage}
             helperText={errorMessage && "This field is required"}
+            sx={styles.searchField}
           />
           <TextField
             margin="dense"
@@ -293,17 +316,29 @@ export default function Location() {
             onChange={handleInputChange}
             error={!!errorMessage}
             helperText={errorMessage && "This field is required"}
+            sx={styles.searchField}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} variant="text">
+          <Button onClick={handleCloseDialog} variant="text"
+            sx={{
+              ...styles.actionButton,
+              color: '#ffffff',
+              border: 'none',
+              background: 'rgba(241, 116, 116, 0.84)',
+              '&:hover': {
+                background: 'rgba(197, 32, 32, 0.87)',
+                boxShadow: 'none',
+              },
+            }}>
             Cancel
           </Button>
           <Button
             onClick={handleSaveLocation}
             variant="contained"
             color="primary"
-            disabled={isLoading.saving}
+            disabled={isLoading.saving || !currentLocation.code || !currentLocation.locationName || !currentLocation.airportName}
+            sx={styles.actionButton}
           >
             {isLoading.saving ? (
               <CircularProgress size={24} color="inherit" />

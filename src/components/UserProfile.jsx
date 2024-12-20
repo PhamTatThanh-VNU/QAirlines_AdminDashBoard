@@ -5,10 +5,10 @@ import { useStateContext } from '../context/ContextProvider';
 import UserService from '../services/UserService'; // Import AuthService
 import { CircularProgress } from '@mui/material';
 const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.clear()
-    window.location.href = '/login'; 
-  };
+  localStorage.removeItem("token");
+  localStorage.clear()
+  window.location.href = '/login';
+};
 const UserProfile = () => {
   const { currentColor } = useStateContext();
   const [user, setUser] = useState(null); // State để lưu thông tin người dùng
@@ -18,20 +18,20 @@ const UserProfile = () => {
     // Gọi API lấy thông tin người dùng khi component mount
     UserService.getUserInfo()
       .then((response) => {
-        setUser(response.data); 
+        setUser(response.data);
       })
       .catch((err) => {
-        setError(err.response ? err.response.data : "An error occurred"); 
+        setError(err.response ? err.response.data : "An error occurred");
       });
-  }, []); 
+  }, []);
 
-  
+
   if (error) {
     return <div>Error: {error}</div>;
   }
 
   if (!user) {
-    return <CircularProgress color="success" size="20px"/>;
+    return <CircularProgress color="success" size="20px" />;
   }
 
   return (
@@ -57,7 +57,7 @@ const UserProfile = () => {
       </div>
       <div className="mt-5">
         <Button color="white"
-          bgColor={currentColor}
+          bgColor="#8DD3BA"
           text="Logout"
           borderRadius="10px"
           width="full"
