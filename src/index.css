@@ -6,6 +6,18 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 
+:root {
+  --primary-color: #8DD3BA;
+  --secondary-color: #ffffff;
+  --text-color: #4f4f4f;
+  --normal-text-color: #6c757d;
+  --prominent-color: #fa7e70;
+  --prominent-color-hover: #ff9e93;
+  --button-color: #8DB883;
+  --button-color-hover: #98dfc5;
+  --background-hover: #ffffffbf;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

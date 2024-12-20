@@ -13,9 +13,10 @@ import {
     CircularProgress,
     Alert
 } from "@mui/material";
-import { fetchLocations } from "../services"; 
+import { fetchLocations } from "../services";
 import { getAllAirCrafts } from "../services";
 import { addNewFlight, updateFlight } from "../services/FlightServices";
+import styles from "../pages/CSS/Style";
 
 export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit }) => {
     const [locations, setLocations] = useState([]);
@@ -29,16 +30,16 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
             const location = await fetchLocations()
             setLocations(location)
         }
-        catch(error) {
+        catch (error) {
             console.log(error)
         }
     }
 
     const aircraftData = async () => {
         try {
-            const aircraft = await getAllAirCrafts()            
+            const aircraft = await getAllAirCrafts()
             setAircraft(aircraft)
-        } catch(error) {
+        } catch (error) {
             console.log(error)
         }
     }
@@ -46,7 +47,7 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
     useEffect(() => {
         locationData()
         aircraftData()
-    } ,[]);
+    }, []);
 
     useEffect(() => {
         if (editingFlight) {
@@ -55,13 +56,13 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                 origin: editingFlight.origin ? `${editingFlight.origin.locationName} (${editingFlight.origin.code})` : "",
                 destination: editingFlight.destination ? `${editingFlight.destination.locationName} (${editingFlight.destination.code})` : "",
                 status: editingFlight.status ? `${editingFlight.status}` : "",
-                aircraft: editingFlight.aircraft ?  `${editingFlight.aircraft.aircraftCode} (${editingFlight.aircraft.manufacturer})`.trim() : ""
+                aircraft: editingFlight.aircraft ? `${editingFlight.aircraft.aircraftCode} (${editingFlight.aircraft.manufacturer})`.trim() : ""
             });
         } else {
             setFormData(
                 columns.reduce((acc, column) => {
                     if (column.field !== "id" && column.field !== "action") {
-                        acc[column.field] = "";        
+                        acc[column.field] = "";
                     }
                     return acc;
                 }, {})
@@ -71,7 +72,7 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
 
     const validateForm = () => {
         const newErrors = {};
-        
+
         // Validate Origin and Destination
         if (!formData.origin) {
             newErrors.origin = "Origin is required";
@@ -102,7 +103,7 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
 
         // Validate other required fields
         const requiredFields = [
-            'flightNumber', 'price', 'availableEconomySeats', 
+            'flightNumber', 'price', 'availableEconomySeats',
             'availableBusinessSeats', 'status', 'aircraft'
         ];
 
@@ -121,7 +122,7 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
 
         // Clear the specific error when user starts typing
         if (errors[name]) {
-            setErrors(prev => ({...prev, [name]: ''}));
+            setErrors(prev => ({ ...prev, [name]: '' }));
         }
 
         let lookupList = [];
@@ -144,21 +145,21 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (!validateForm()) {
             return;
         }
-        
+
         try {
-            const originLocation = locations.find(loc => 
+            const originLocation = locations.find(loc =>
                 loc.locationName + " (" + loc.code + ")" === formData.origin
             );
 
-            const destinationLocation = locations.find(loc => 
+            const destinationLocation = locations.find(loc =>
                 loc.locationName + " (" + loc.code + ")" === formData.destination
             );
 
-            const selectedAircraft = aircrafts.find(air => 
+            const selectedAircraft = aircrafts.find(air =>
                 (air.aircraftCode + " (" + air.manufacturer + ")").trim() === formData.aircraft
             );
 
@@ -193,12 +194,12 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                 },
                 createdAt: new Date().toISOString()
             };
-            
+
             let response
             setLoading(true)
             if (editingFlight) {
-                response = await updateFlight(editingFlight.flightId, flightDTO); 
-            } else {    
+                response = await updateFlight(editingFlight.flightId, flightDTO);
+            } else {
                 response = await addNewFlight(flightDTO);
             }
 
@@ -207,7 +208,7 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
             } else {
                 onAdd(response);
             }
-            
+
             onClose();
         } catch (error) {
             console.error("Error adding/editing flight:", error);
@@ -219,18 +220,18 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-            <DialogTitle>{editingFlight ? "Edit Flight" : "Add New Flight"}</DialogTitle>
-            <DialogContent>
+            <DialogTitle sx={styles.dialogTitle}>{editingFlight ? "Edit Flight" : "Add New Flight"}</DialogTitle>
+            <DialogContent sx={styles.dialogContent}>
                 <form onSubmit={handleSubmit}>
                     {columns
                         .filter((column) => column.field !== "id" && column.field !== "action")
                         .map((column) => {
                             if (column.field === "origin" || column.field === "destination") {
                                 return (
-                                    <FormControl 
-                                        key={column.field} 
-                                        fullWidth 
-                                        margin="dense" 
+                                    <FormControl
+                                        key={column.field}
+                                        fullWidth
+                                        margin="dense"
                                         error={!!errors[column.field]}
                                     >
                                         <InputLabel>{column.headerName}</InputLabel>
@@ -239,18 +240,20 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                                             name={column.field}
                                             value={formData[column.field] || ''}
                                             onChange={handleChange}
+                                            sx={styles.selectField}
                                         >
-                                            {locations.map((location) => (                    
-                                                <MenuItem 
-                                                    key={location.id} 
+                                            {locations.map((location) => (
+                                                <MenuItem
+                                                    key={location.id}
                                                     value={location.locationName + " (" + location.code + ")"}
+
                                                 >
-                                                    {location.locationName + " (" + location.code + ")"}                                            
+                                                    {location.locationName + " (" + location.code + ")"}
                                                 </MenuItem>
                                             ))}
                                         </Select>
                                         {errors[column.field] && (
-                                            <Alert severity="error" style={{marginTop: 8}}>
+                                            <Alert severity="error" style={{ marginTop: 8 }}>
                                                 {errors[column.field]}
                                             </Alert>
                                         )}
@@ -275,17 +278,19 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                                         }}
                                         error={!!errors[column.field]}
                                         helperText={errors[column.field]}
+                                        sx={styles.textField}
                                     />
                                 );
                             }
 
                             if (column.field === "status") {
                                 return (
-                                    <FormControl 
-                                        key={column.field} 
-                                        fullWidth 
-                                        margin="dense" 
+                                    <FormControl
+                                        key={column.field}
+                                        fullWidth
+                                        margin="dense"
                                         error={!!errors[column.field]}
+                                        sx={styles.formControl}
                                     >
                                         <InputLabel>Status</InputLabel>
                                         <Select
@@ -293,13 +298,14 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                                             name="status"
                                             value={formData.status || ''}
                                             onChange={handleChange}
+                                            sx={styles.selectField}
                                         >
                                             <MenuItem value="SCHEDULED">Scheduled</MenuItem>
                                             <MenuItem value="CANCELLED">Cancelled</MenuItem>
                                             <MenuItem value="COMPLETED">Completed</MenuItem>
                                         </Select>
                                         {errors.status && (
-                                            <Alert severity="error" style={{marginTop: 8}}>
+                                            <Alert severity="error" style={{ marginTop: 8 }}>
                                                 {errors.status}
                                             </Alert>
                                         )}
@@ -309,10 +315,10 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
 
                             if (column.field === "aircraft") {
                                 return (
-                                    <FormControl 
-                                        key={column.field} 
-                                        fullWidth 
-                                        margin="dense" 
+                                    <FormControl
+                                        key={column.field}
+                                        fullWidth
+                                        margin="dense"
                                         error={!!errors[column.field]}
                                     >
                                         <InputLabel>{column.headerName}</InputLabel>
@@ -321,10 +327,11 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                                             name={column.field}
                                             value={formData[column.field] || ''}
                                             onChange={handleChange}
+                                            sx={styles.selectField}
                                         >
                                             {aircrafts.map((air) => (
-                                                <MenuItem 
-                                                    key={air.id}   
+                                                <MenuItem
+                                                    key={air.id}
                                                     value={`${air.aircraftCode} (${air.manufacturer})`.trim()}
                                                 >
                                                     {`${air.aircraftCode} (${air.manufacturer})`}
@@ -332,7 +339,7 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                                             ))}
                                         </Select>
                                         {errors[column.field] && (
-                                            <Alert severity="error" style={{marginTop: 8}}>
+                                            <Alert severity="error" style={{ marginTop: 8 }}>
                                                 {errors[column.field]}
                                             </Alert>
                                         )}
@@ -355,6 +362,7 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                                         inputProps={{ min: 0 }}
                                         error={!!errors[column.field]}
                                         helperText={errors[column.field]}
+                                        sx={styles.textField}
                                     />
                                 );
                             }
@@ -372,20 +380,34 @@ export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit
                                     variant="outlined"
                                     error={!!errors[column.field]}
                                     helperText={errors[column.field]}
+                                    sx={styles.textField}
                                 />
                             );
                         })}
                 </form>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} color="secondary">
+                <Button onClick={onClose}
+                    sx={{
+                        ...styles.actionButton,
+                        color: '#ffffff',
+                        border: 'none',
+                        background: 'rgba(241, 116, 116, 0.84)',
+                        '&:hover': {
+                            background: 'rgba(197, 32, 32, 0.87)',
+                            boxShadow: 'none',
+                        },
+                    }}>
                     Cancel
                 </Button>
-                <Button 
-                    onClick={handleSubmit} 
-                    color="primary" 
+                <Button
+                    onClick={handleSubmit}
+                    color="primary"
                     disabled={loading}
                     variant="contained"
+                    sx={{
+                        ...styles.actionButton,
+                    }}
                     startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
                 >
                     {loading ? "Processing..." : (editingFlight ? "Save Changes" : "Add")}

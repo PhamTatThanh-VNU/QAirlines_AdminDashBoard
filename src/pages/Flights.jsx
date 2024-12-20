@@ -1,50 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Typography, 
-  Paper, 
-  IconButton, 
-  Snackbar, 
-  CircularProgress,
-  Alert,
-  Container,
-  Chip
+import {
+    Typography,
+    Paper,
+    IconButton,
+    Snackbar,
+    CircularProgress,
+    Alert,
+    Container,
+    Chip,
+    Box
 } from "@mui/material";
-import { 
-  AccessTime, 
-  Cancel, 
-  CheckCircle, 
-  Edit, 
-  Delete, 
-  Flight as FlightIcon 
+import {
+    AccessTime,
+    Cancel,
+    CheckCircle,
+    Edit,
+    Delete,
+    Flight as FlightIcon
 } from "@mui/icons-material";
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { createTheme, styled, ThemeProvider } from '@mui/material/styles';
 import { blue, teal, grey } from '@mui/material/colors';
 import { AddFlight } from "../components/AddFlight";
 import { getAllFlights, deleteFlight } from "../services/FlightServices";
+import styles from './CSS/Style';
 
 // Custom Styled Components
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(4),
-  backgroundColor: '#f0f4f8', // Soft blue-grey background
-  borderRadius: theme.spacing(3),
-  boxShadow: '0 12px 24px rgba(0,0,0,0.1)', // Enhanced shadow
-  position: 'relative',
-  overflow: 'hidden',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '10px',
-    background: `linear-gradient(to right, ${teal[500]}, ${blue[500]})`, // Gradient header accent
-  }
-}));
-
 const CustomChip = styled(Chip)(({ theme }) => ({
-  fontWeight: 600,
-  borderRadius: theme.spacing(1.5),
+    fontWeight: 600,
+    borderRadius: theme.spacing(1.5),
 }));
 
 export default function Flight() {
@@ -52,19 +36,19 @@ export default function Flight() {
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [editingFlight, setEditingFlight] = useState(null);
-    
+
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState({
-        fetching: false,        
-        deleting: false 
+        fetching: false,
+        deleting: false
     });
 
     const formatDate = (date) => {
         try {
-            const [datePart, timePart] = date.split("T");  
-            const [year, month, day] = datePart.split("-"); 
-            const [hour, minute] = timePart.split(":"); 
-        
+            const [datePart, timePart] = date.split("T");
+            const [year, month, day] = datePart.split("-");
+            const [hour, minute] = timePart.split(":");
+
             return `${hour}:${minute} ${day}-${month}-${year}`;
         } catch (err) {
             console.error("Date formatting error:", err);
@@ -89,7 +73,7 @@ export default function Flight() {
         fetchFlights();
     }, []);
 
-     const handleAddFlight = (newFlight) => {
+    const handleAddFlight = (newFlight) => {
         try {
             setFlights((prevFlights) => [
                 ...prevFlights,
@@ -138,118 +122,125 @@ export default function Flight() {
         }
     };
 
-    const columns = [    
-        { 
-            field: "flightNumber", 
-            headerName: "Chuyến Bay", 
-            width: 120,
+    const columns = [
+        {
+            field: "flightNumber",
+            headerName: "Flight No.",
+            // width: 120,
+            flex: 1,
             renderCell: (params) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={styles.flightNumberCell}>
                     <FlightIcon color="primary" />
                     {params.value}
                 </div>
             )
         },
-        { 
-            field: "origin", 
-            headerName: "Điểm Đi", 
-            width: 150 
+        {
+            field: "origin",
+            headerName: "Departure",
+            // width: 150
+            flex: 1.5
         },
-        { 
-            field: "destination", 
-            headerName: "Điểm Đến", 
-            width: 150 
+        {
+            field: "destination",
+            headerName: "Arrival",
+            // width: 150
+            flex: 1.5
         },
-        { 
-            field: "departureTime", 
-            headerName: "Khởi Hành", 
-            width: 200 
+        {
+            field: "departureTime",
+            headerName: "Departure Time",
+            // width: 150
+            flex: 1.5
         },
-        { 
-            field: "arrivalTime", 
-            headerName: "Hạ Cánh", 
-            width: 200 
+        {
+            field: "arrivalTime",
+            headerName: "Arrival Time",
+            // width: 150
+            flex: 1.5
         },
-        { 
-            field: "price", 
-            headerName: "Giá Vé", 
-            width: 120,
+        {
+            field: "price",
+            headerName: "Price",
+            // width: 120,
+            flex: 1,
             renderCell: (params) => (
-                <CustomChip 
-                    label={`$${params.value}`} 
-                    color="primary" 
-                    variant="outlined" 
-                    size="small"
+                <Chip
+                    label={`$${params.value}`}
+                    style={styles.priceChip}
                 />
             )
         },
         {
-            field: "status", 
-            headerName: "Trạng Thái", 
-            width: 120,
+            field: "status",
+            headerName: "Status",
+            // width: 120,
+            flex: 1.2,
             renderCell: (params) => {
                 const status = params.value;
-                let chipColor, icon;
-                switch(status) {
+                let icon, chipColor;
+                switch (status) {
                     case 'SCHEDULED':
-                        chipColor = 'info';
-                        icon = <AccessTime />;
+                        chipColor = 'rgba(97, 184, 213, 0.67)';
+                        icon = <AccessTime style={{ color: 'rgb(13, 159, 207)' }} />;
                         break;
                     case 'CANCELLED':
-                        chipColor = 'error';
-                        icon = <Cancel />;
+                        chipColor = 'rgba(244, 67, 54, 0.67)';
+                        icon = <Cancel style={{ color: 'rgba(241, 33, 18, 0.67)' }} />;
                         break;
                     case 'COMPLETED':
-                        chipColor = 'success';
-                        icon = <CheckCircle />;
+                        chipColor = 'rgba(108, 204, 171, 0.67)';
+                        icon = <CheckCircle style={{ color: 'rgba(6, 203, 134, 0.9)' }} />;
                         break;
                     default:
                         chipColor = 'default';
                         icon = null;
                 }
                 return (
-                    <CustomChip 
-                        icon={icon} 
-                        label={status} 
-                        color={chipColor} 
-                        size="small" 
+                    <Chip
+                        icon={icon}
+                        label={status}
                         variant="outlined"
+                        style={{ ...styles.statusChipBase, backgroundColor: chipColor, border: 'none', padding: '2px' }}
                     />
                 );
             }
         },
         { field: "aircraft", headerName: "Aircraft", width: 90 },
         {
-            field: "action", 
-            headerName: "Actions", 
-            width: 100, 
+            field: "action",
+            headerName: "Actions",
+            width: 100,
             sortable: false,
             renderCell: (params) => (
                 <>
-                    <IconButton 
-                        color="primary" 
+                    <IconButton
+                        color="primary"
                         onClick={() => handleEditFlight(params.row.id - 1)}
                         disabled={loading.deleting && loading.deletingId === params.row.id}
+                        sx={{ ...styles.iconButton, color: '#1976d2' }}
                     >
                         <Edit />
                     </IconButton>
-                    <IconButton 
-                        color="secondary" 
-                        onClick={() => handleDeleteFlight(params.row.id)} 
+                    <IconButton
+                        onClick={() => handleDeleteFlight(params.row.id)}
                         disabled={loading.deleting && loading.deletingId === params.row.id}
+                        sx={{ ...styles.iconButton, color: '#d32f2f' }}
                     >
-                        {loading.deleting && loading.deletingId === params.row.id ? (
-                            <CircularProgress size={24} color="inherit" />
-                        ) : (
-                            <Delete />
-                        )}                    
+                        {
+                            loading.deleting && loading.deletingId === params.row.id ? (
+                                <CircularProgress size={24} color="inherit" />
+                            ) : (
+                                <Delete />
+                            )
+                        }
                     </IconButton>
                 </>
             ),
         },
     ];
 
-     const rows = flights.map((flight) => ({
+    const rows = flights.map((flight) => ({
         id: flight.flightId,
         flightNumber: flight.flightNumber || 'N/A',
         origin: flight.origin?.airportName || 'Unknown',
@@ -263,152 +254,113 @@ export default function Flight() {
         aircraft: flight.aircraft?.aircraftCode || 'N/A',
     }));
 
-    const theme = createTheme({
-        palette: {
-            primary: {
-                main: teal[600],
-            },
-            secondary: {
-                main: blue[600],
-            },
-            background: {
-                default: grey[100],
-                paper: '#ffffff',
-            },
-        },
-        typography: {
-            fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-        },
-        shape: {
-            borderRadius: 12
-        },
-        components: {
-            MuiDataGrid: {
-                styleOverrides: {
-                    root: {
-                        border: 'none',
-                        '& .MuiDataGrid-columnHeaders': {
-                            backgroundColor: teal[50],
-                            color: teal[800],
-                        }
-                    }
-                }
-            }
-        }
-    });
-
     return (
-        <Container maxWidth="xl">
-            <StyledPaper elevation={3}>
-                <Typography 
-                    variant="h4" 
-                    gutterBottom 
-                    sx={{ 
-                        mb: 3, 
-                        fontWeight: 'bold', 
-                        color: teal[800],
-                        textAlign: 'center',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 2
-                    }}
-                >
-                    <FlightIcon fontSize="large" /> Quản Lý Chuyến Bay
-                </Typography>        
-                
-               <ThemeProvider theme={theme}>
-                <div style={{ 
-                height: 600, 
-                width: "100%", 
-                backgroundColor: '#f4f6f8',
-                padding: '16px',
-                borderRadius: 12
-            }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    loading={loading.fetching}
-                    initialState={{
-                        pagination: {
-                            paginationModel: {
-                                pageSize: 10,
-                            }
-                        },
-                    }}
-                    slots={{ 
-                        toolbar: GridToolbar,
-                        noRowsOverlay: () => (
-                            <div style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                height: '100%',
-                                color: blue[500],
-                                fontWeight: 500
-                            }}>
-                                <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    width="100" 
-                                    height="100" 
-                                    viewBox="0 0 24 24" 
-                                    fill="none" 
-                                    stroke={blue[500]} 
-                                    strokeWidth="1" 
-                                    style={{ opacity: 0.5, marginBottom: 16 }}
-                                >
-                                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
-                                </svg>
-                                No Flights Available
-                            </div>
-                        )
-                    }}
-                    slotProps={{
-                        toolbar: {
-                            showQuickFilter: true,
-                            quickFilterProps: { 
-                                placeholder: 'Search flights...', 
-                                debounceMs: 400,
-                                variant: 'outlined',
-                                size: 'small',
-                                sx: {
-                                    backgroundColor: 'white',
-                                    borderRadius: 2,
-                                    '& .MuiOutlinedInput-root': {
-                                        '& fieldset': {
-                                            borderColor: blue[200],
-                                        },
-                                        '&:hover fieldset': {
-                                            borderColor: blue[400],
-                                        },
-                                    }
+        <Container sx={{ marginBottom: 4 }}>
+            <Box elevation={3}>
+                <Box sx={styles.boxBackground}>
+                    <Typography
+                        variant="h4"
+                        sx={{
+                            mb: 3,
+                            fontWeight: 'bold',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 2,
+                        }}
+                    >
+                        <FlightIcon fontSize="large" /> Flight Management
+                    </Typography>
+                </Box>
+
+                <Box sx={{
+                    ...styles.dataGridContainer,
+                    marginBottom: 2,
+                    ...styles.tableContainer,
+                    paddingTop: '20px',
+                }}>
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        loading={loading.fetching}
+                        initialState={{
+                            pagination: {
+                                paginationModel: {
+                                    pageSize: 10,
                                 }
                             },
-                        }
-                    }}
-                    checkboxSelection
-                    disableRowSelectionOnClick
-                    pageSizeOptions={[5, 10, 25]}
-                    sx={{
-                        '& .MuiDataGrid-footerContainer': {
-                            backgroundColor: blue[50],
-                            borderTop: `1px solid ${blue[100]}`,
-                        }
-                    }}
-                />
-            </div>
-            </ThemeProvider>
+                        }}
+                        slots={{
+                            toolbar: GridToolbar,
+                            noRowsOverlay: () => (
+                                <div style={styles.noRowsOverlay}>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="100"
+                                        height="100"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        // stroke={blue[500]}
+                                        strokeWidth="1"
+                                        style={{ opacity: 0.5, marginBottom: 16 }}
+                                    >
+                                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                        <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
+                                    </svg>
+                                    No Flights Available
+                                </div>
+                            )
+                        }}
+                        slotProps={{
+                            toolbar: {
+                                showQuickFilter: true,
+                                quickFilterProps: {
+                                    placeholder: 'Search flights...',
+                                    variant: 'outlined',
+                                    size: 'medium',
+                                    sx: {
+                                        ...styles.searchField,
+                                        flexGrow: 1,
+                                        padding: '0',
+                                        marginRight: '10px',
+                                        maxWidth: '500px',
+                                        '& .MuiSvgIcon-root': {
+                                            fontSize: '1.5rem',
+                                            marginRight: 1.5,
+                                            ...styles.searchIcon,
+                                        },
+                                        '& .MuiButtonBase-root': {
+                                            display: 'none',
+                                        },
+                                    }
+                                },
+                                sx: {
+                                    padding: '0 20px 15px 15px',
+                                    '& .MuiButtonBase-root': {
+                                        color: '#8DD3BA',
+                                        fontWeight: '500',
+                                    },
+                                }
+                            }
+                        }}
+                        checkboxSelection
+                        disableRowSelectionOnClick
+                        pageSizeOptions={[5, 10, 25]}
+                        sx={{
+                            ...styles.dataGrid,
+                        }}
+                    />
+                </Box>
                 <Snackbar
                     open={!!error}
                     autoHideDuration={6000}
                     onClose={() => setError(null)}
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 >
-                    <Alert 
-                        onClose={() => setError(null)} 
-                        severity="error" 
+                    <Alert
+                        onClose={() => setError(null)}
+                        severity="error"
                         sx={{ width: '100%' }}
                     >
                         {error}
@@ -429,7 +381,7 @@ export default function Flight() {
                     editingFlight={editingFlight}
                     onEdit={handleSaveEditedFlight}
                 />
-            </StyledPaper>
-        </Container>
+            </Box>
+        </Container >
     );
 }
