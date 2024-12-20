@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import {
     Typography,
-    Paper,
     IconButton,
     Snackbar,
     CircularProgress,
     Alert,
     Container,
     Chip,
+    Button,
     Box
 } from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
 import {
     AccessTime,
     Cancel,
@@ -19,17 +20,9 @@ import {
     Flight as FlightIcon
 } from "@mui/icons-material";
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { createTheme, styled, ThemeProvider } from '@mui/material/styles';
-import { blue, teal, grey } from '@mui/material/colors';
 import { AddFlight } from "../components/AddFlight";
 import { getAllFlights, deleteFlight } from "../services/FlightServices";
 import styles from './CSS/Style';
-
-// Custom Styled Components
-const CustomChip = styled(Chip)(({ theme }) => ({
-    fontWeight: 600,
-    borderRadius: theme.spacing(1.5),
-}));
 
 export default function Flight() {
     const [flights, setFlights] = useState([]);
@@ -61,6 +54,7 @@ export default function Flight() {
             try {
                 setLoading((prev) => ({ ...prev, fetching: true }));
                 const flightsData = await getAllFlights();
+                console.log(flightsData)
                 setFlights(flightsData || []);
                 setError(null);
             } catch (error) {
@@ -138,24 +132,33 @@ export default function Flight() {
         {
             field: "origin",
             headerName: "Departure",
-            // width: 150
             flex: 1.5
         },
         {
             field: "destination",
             headerName: "Arrival",
-            // width: 150
             flex: 1.5
         },
         {
             field: "departureTime",
             headerName: "Departure Time",
-            // width: 150
             flex: 1.5
         },
         {
             field: "arrivalTime",
             headerName: "Arrival Time",
+            // width: 150
+            flex: 1.5
+        },
+        {
+            field: "availableBusinessSeats",
+            headerName: "Business Seat",
+            // width: 150
+            flex: 1.5
+        },
+          {
+            field: "availableEconomySeats",
+            headerName: "Economy Seat",
             // width: 150
             flex: 1.5
         },
@@ -239,7 +242,7 @@ export default function Flight() {
             ),
         },
     ];
-
+    
     const rows = flights.map((flight) => ({
         id: flight.flightId,
         flightNumber: flight.flightNumber || 'N/A',
@@ -253,6 +256,8 @@ export default function Flight() {
         status: flight.status || 'Unknown',
         aircraft: flight.aircraft?.aircraftCode || 'N/A',
     }));
+
+    
 
     return (
         <Container sx={{ marginBottom: 4 }}>
@@ -273,7 +278,28 @@ export default function Flight() {
                         <FlightIcon fontSize="large" /> Flight Management
                     </Typography>
                 </Box>
-
+                     <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    mb: 2,
+                    px: 2
+                }}>
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={() => setOpenAddDialog(true)}
+                        sx={{
+                            backgroundColor: '#8DD3BA',
+                            color: 'white',
+                            '&:hover': {
+                                backgroundColor: '#7BC0A9',
+                            },
+                            height: '40px'
+                        }}
+                    >
+                        Add Flight
+                    </Button>
+                </Box>
                 <Box sx={{
                     ...styles.dataGridContainer,
                     marginBottom: 2,
@@ -366,14 +392,12 @@ export default function Flight() {
                         {error}
                     </Alert>
                 </Snackbar>
-
-                <AddFlight
+                     <AddFlight
                     open={openAddDialog}
                     onClose={() => setOpenAddDialog(false)}
                     columns={columns}
                     onAdd={handleAddFlight}
                 />
-
                 <AddFlight
                     open={openEditDialog}
                     onClose={() => setOpenEditDialog(false)}

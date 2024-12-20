@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { MdOutlineCancel } from 'react-icons/md';
 import { Button } from '.';
-import { useStateContext } from '../context/ContextProvider';
 import UserService from '../services/UserService'; // Import AuthService
 import { CircularProgress } from '@mui/material';
 const handleLogout = () => {
@@ -10,9 +9,9 @@ const handleLogout = () => {
   window.location.href = '/login';
 };
 const UserProfile = () => {
-  const { currentColor } = useStateContext();
   const [user, setUser] = useState(null); // State để lưu thông tin người dùng
   const [error, setError] = useState(null); // State để lưu lỗi nếu có
+  const [isProfileVisible, setIsProfileVisible] = useState(true); // Quản lý hiển thị thẻ profile
 
   useEffect(() => {
     // Gọi API lấy thông tin người dùng khi component mount
@@ -25,7 +24,9 @@ const UserProfile = () => {
       });
   }, []);
 
-
+  if (error || !isProfileVisible) {
+    return null; // Không hiển thị gì
+  }
   if (error) {
     return <div>Error: {error}</div>;
   }
@@ -44,6 +45,8 @@ const UserProfile = () => {
           bgHoverColor="light-gray"
           size="2xl"
           borderRadius="50%"
+          onClick={() => setIsProfileVisible(false)} // Cập nhật trạng thái để ẩn thẻ
+
         />
       </div>
       <div className="flex gap-5 items-center mt-6 border-color border-b-1 pb-6">
