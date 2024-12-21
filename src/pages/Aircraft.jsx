@@ -35,6 +35,7 @@ import {
   updateAirCraft,
   deleteAirCraft
 } from '../services';
+import { LoadingState } from '../components';
 import styles from './CSS/Style';
 
 // const styles = {
@@ -287,7 +288,7 @@ const Aircraft = () => {
     <Box sx={{ p: 3, minHeight: '100vh', background: '#f5f5f5' }}>
       {isLoading.fetching ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-          <CircularProgress size={60} thickness={4} />
+          <LoadingState size={60} thickness={4} />
         </Box>
       ) : (
         <>

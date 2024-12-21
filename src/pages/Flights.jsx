@@ -54,7 +54,6 @@ export default function Flight() {
             try {
                 setLoading((prev) => ({ ...prev, fetching: true }));
                 const flightsData = await getAllFlights();
-                console.log(flightsData)
                 setFlights(flightsData || []);
                 setError(null);
             } catch (error) {

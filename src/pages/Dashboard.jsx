@@ -15,9 +15,9 @@ import {
   TableRow,
   LinearProgress,
   Stack,
-  CircularProgress,
 } from '@mui/material';
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket';
+import { LoadingState } from '../components';
 import PeopleIcon from '@mui/icons-material/People';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { fetchAllBookings } from '../services/BookingServices';
@@ -67,7 +67,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <CircularProgress />
+        <LoadingState />
       </Box>
     );
   }

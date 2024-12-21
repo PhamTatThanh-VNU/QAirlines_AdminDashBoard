@@ -17,7 +17,6 @@ import { fetchLocations } from "../services";
 import { getAllAirCrafts } from "../services";
 import { addNewFlight, updateFlight } from "../services/FlightServices";
 import styles from "../pages/CSS/Style";
-
 export const AddFlight = ({ open, onClose, columns, onAdd, editingFlight, onEdit }) => {
     const [locations, setLocations] = useState([]);
     const [aircrafts, setAircraft] = useState([]);

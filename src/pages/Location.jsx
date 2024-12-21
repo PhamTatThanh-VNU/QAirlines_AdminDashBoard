@@ -14,12 +14,12 @@ import {
   TableHead,
   TableRow,
   Button,
+  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   TextField,
-  CircularProgress,
   IconButton,
   Snackbar,
   Alert,
@@ -34,6 +34,7 @@ import {
   Search as SearchIcon,
   Place as PlaceIcon
 } from "@mui/icons-material";
+import { LoadingState } from "../components";
 import styles from './CSS/Style';
 
 export default function Location() {
@@ -217,7 +218,7 @@ export default function Location() {
 
       {isLoading.fetching ? (
         <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
-          <CircularProgress />
+          <LoadingState />
         </Box>
       ) : (
         <TableContainer component={Paper} sx={styles.tableContainer}>

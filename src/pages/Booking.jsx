@@ -34,6 +34,7 @@ import {
   AirplaneTicket,
   NoLuggage
 } from '@mui/icons-material';
+import { LoadingState } from '../components';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { createTheme, ThemeProvider, alpha } from '@mui/material/styles';
@@ -327,7 +328,7 @@ const BookingManagement = () => {
 
           {loading.fetching ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <CircularProgress />
+              <LoadingState />
             </Box>
           ) : filteredBookings.length === 0 ? (
             <Box

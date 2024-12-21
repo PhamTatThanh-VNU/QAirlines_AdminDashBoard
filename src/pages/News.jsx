@@ -320,7 +320,7 @@ const NewsManagement = () => {
 
   return isLoading.fetching ? (
     <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-      <CircularProgress size={40} thickness={4} />
+      <LoadingState  />
     </Box>
   ) : (
     <Container maxWidth="lg" sx={{ py: 4 }}>
