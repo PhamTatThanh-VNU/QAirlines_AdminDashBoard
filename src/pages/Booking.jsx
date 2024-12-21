@@ -224,23 +224,30 @@ const BookingManagement = () => {
           padding: { xs: 2, sm: 3, md: 4 },
         }}
       >
-        <Typography
-          variant="h4"
-          sx={{
-            mb: 4,
-            fontWeight: 800,
-            color: teal[800],
-            textAlign: 'center',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 2,
-            ...styles.boxBackground
-          }}
-        >
-          <AirplaneTicket fontSize="large" />
-          Booking Management
-        </Typography>
+        <Box sx={{ mb: 4, ...styles.boxBackground }}>
+          <Box>
+            <Typography
+              variant="h4"
+              sx={{
+                mb: 4,
+                fontWeight: 800,
+                textAlign: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 2,
+              }}
+            >
+
+              <AirplaneTicket fontSize="large" />
+              Booking Management
+            </Typography>
+          </Box>
+          <Typography variant="subtitle1" sx={{ opacity: 0.8, textAlign: 'center' }}>
+            Easily manage and track all bookings in one place.
+          </Typography>
+        </Box>
+
 
         <Paper
           elevation={12}
@@ -585,7 +592,7 @@ const BookingManagement = () => {
           </DialogActions>
         </Dialog>
       </Box>
-    </ThemeProvider>
+    </ThemeProvider >
   );
 };
 

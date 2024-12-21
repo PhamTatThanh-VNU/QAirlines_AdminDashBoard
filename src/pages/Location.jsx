@@ -161,7 +161,7 @@ export default function Location() {
 
   return (
     <Box sx={{ width: "100%", p: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', ...styles.boxBackground }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', ...styles.boxBackground }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <PlaceIcon sx={{ fontSize: 40, mr: 2, color: 'white' }} />
           <Typography
@@ -174,6 +174,10 @@ export default function Location() {
             Location Management
           </Typography>
         </Box>
+
+        <Typography variant="subtitle1" sx={{ opacity: 0.8, textAlign: 'center' }}>
+          Efficiently manage and update all airport and destination information.
+        </Typography>
       </Box>
       <Box
         sx={{

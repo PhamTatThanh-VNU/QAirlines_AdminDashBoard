@@ -47,7 +47,7 @@ import PublishIcon from '@mui/icons-material/Publish';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import './CSS/CustomQuillEditor.css';
 import styles from './CSS/Style';
-
+import { LoadingState } from '../components/LoadingState';
 // Styled Components
 const StyledPaper = styled(Paper)(({ theme }) => ({
   background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.9)}, ${alpha(theme.palette.background.paper, 0.95)})`,
@@ -332,7 +332,7 @@ const NewsManagement = () => {
               component="h1"
               sx={{
                 fontWeight: 700,
-                background: '-webkit-linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                background: 'rgba(108, 204, 171, 0.67)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}

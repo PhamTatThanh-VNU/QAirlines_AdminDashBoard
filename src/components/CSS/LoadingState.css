@@ -1,0 +1,158 @@
+.loading-background {
+    width: 100%;
+    height: 100%;
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.loading-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: var(--primary-color);
+    transform: translate(-30%, -50%);
+}
+
+
+.plane-icon {
+    width: 10rem;
+    height: 10rem;
+    animation: move 2s linear infinite;
+}
+
+.line {
+    content: '';
+    position: absolute;
+    height: 6px;
+    background-color: var(--primary-color);
+    border-radius: 50px;
+    transform: rotate(-30deg);
+}
+
+.line-1 {
+    width: 120px;
+    bottom: 5%;
+    left: -70%;
+    animation: move1 2s linear infinite;
+}
+
+.line-2 {
+    width: 60px;
+    bottom: 5%;
+    left: -25%;
+    animation: move2 2s linear infinite;
+
+}
+
+.cloud {
+    position: absolute;
+    font-size: 70px;
+}
+
+.cloud-1 {
+    top: 0%;
+    left: -70%;
+    animation: move3 2s linear infinite;
+}
+
+.cloud-2 {
+    bottom: -50%;
+    left: 30%;
+    animation: move3 2s linear infinite;
+}
+
+.cloud-3 {
+    bottom: 0%;
+    left: 100%;
+    animation: move4 2s linear infinite;
+}
+
+
+@keyframes move {
+    0% {
+        transform: translate(0px, 0px) rotate(-10deg);
+        /* Vị trí ban đầu */
+    }
+
+    50% {
+        transform: translate(-20px, 20px) rotate(-10deg);
+        /* Đi lên theo trục 45 độ */
+    }
+
+    100% {
+        transform: translate(0px, 0px) rotate(-10deg);
+        /* Quay lại vị trí ban đầu */
+    }
+}
+
+@keyframes move1 {
+    0% {
+        width: 100px;
+        /* Độ dài ban đầu */
+    }
+
+    50% {
+        width: 120px;
+        /* Độ dài ngắn lại */
+    }
+
+    100% {
+        width: 100px;
+        /* Quay lại độ dài ban đầu */
+    }
+}
+
+@keyframes move2 {
+    0% {
+        transform: translate(0px, 0px) rotate(-30deg);
+        /* Giữ lại rotate */
+    }
+
+    50% {
+        transform: translate(-18px, 10px) rotate(-30deg);
+        /* Giữ lại rotate */
+    }
+
+    100% {
+        transform: translate(0px, 0px) rotate(-30deg);
+        /* Quay lại vị trí ban đầu */
+    }
+}
+
+@keyframes move3 {
+    0% {
+        transform: translateX(0);
+        /* Vị trí ban đầu */
+    }
+
+    50% {
+        transform: translateX(15px);
+        /* Di chuyển sang phải 10px */
+    }
+
+    100% {
+        transform: translateX(0);
+        /* Quay về vị trí ban đầu */
+    }
+}
+
+@keyframes move4 {
+    0% {
+        transform: translateX(-20px);
+        /* Di chuyển sang phải 10px */
+    }
+
+    50% {
+        transform: translateX(0px);
+        /* Di chuyển sang phải 10px */
+    }
+
+    100% {
+        transform: translateX(-20px);
+        /* Di chuyển sang phải 10px */
+    }
+}

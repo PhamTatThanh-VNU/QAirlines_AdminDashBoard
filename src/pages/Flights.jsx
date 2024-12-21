@@ -156,7 +156,7 @@ export default function Flight() {
             // width: 150
             flex: 1.5
         },
-          {
+        {
             field: "availableEconomySeats",
             headerName: "Economy Seat",
             // width: 150
@@ -242,7 +242,7 @@ export default function Flight() {
             ),
         },
     ];
-    
+
     const rows = flights.map((flight) => ({
         id: flight.flightId,
         flightNumber: flight.flightNumber || 'N/A',
@@ -257,7 +257,7 @@ export default function Flight() {
         aircraft: flight.aircraft?.aircraftCode || 'N/A',
     }));
 
-    
+
 
     return (
         <Container sx={{ marginBottom: 4 }}>
@@ -277,8 +277,12 @@ export default function Flight() {
                     >
                         <FlightIcon fontSize="large" /> Flight Management
                     </Typography>
+
+                    <Typography variant="subtitle1" sx={{ opacity: 0.8, textAlign: 'center' }}>
+                        Seamlessly manage flight schedules, routes, and availability
+                    </Typography>
                 </Box>
-                     <Box sx={{
+                <Box sx={{
                     display: 'flex',
                     justifyContent: 'flex-end',
                     mb: 2,
@@ -392,7 +396,7 @@ export default function Flight() {
                         {error}
                     </Alert>
                 </Snackbar>
-                     <AddFlight
+                <AddFlight
                     open={openAddDialog}
                     onClose={() => setOpenAddDialog(false)}
                     columns={columns}
