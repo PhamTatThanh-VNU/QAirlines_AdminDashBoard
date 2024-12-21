@@ -497,7 +497,7 @@ const BookingManagement = () => {
                 }}
               >
                 <FlightTakeoff />
-                Chi Tiết Đơn Đặt: {selectedBooking.bookingNumber}
+                Detail Booking: {selectedBooking.bookingNumber}
               </DialogTitle>
               <DialogContent sx={{ mt: 2 }}>
                 <Box
@@ -518,7 +518,7 @@ const BookingManagement = () => {
                   <Typography><strong>Arrival Time:</strong> {new Date(selectedBooking.arrivalTime).toLocaleString()}</Typography>
                   <Typography><strong>Ticket Class:</strong> {selectedBooking.ticketClass}</Typography>
                   <Typography><strong>Total Passengers:</strong> {selectedBooking.totalPeople}</Typography>
-                  <Typography><strong>Price:</strong> {selectedBooking.price.toLocaleString()} VND</Typography>
+                  <Typography><strong>Price:</strong> {selectedBooking.price.toLocaleString()} USD</Typography>
                   <Typography><strong>Status:</strong> {selectedBooking.status}</Typography>
                 </Box>
               </DialogContent>

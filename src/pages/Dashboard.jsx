@@ -83,12 +83,12 @@ const Dashboard = () => {
                 <AttachMoneyIcon sx={{ fontSize: 40 }} />
                 <Box>
                   <Typography color="textSecondary" gutterBottom>
-                    Tổng doanh thu
+                    Total Revenue
                   </Typography>
                   <Typography variant="h5">
-                    {new Intl.NumberFormat('vi-VN', {
+                    {new Intl.NumberFormat('en-EN', {
                       style: 'currency',
-                      currency: 'VND'
+                      currency: 'USD'
                     }).format(totalRevenue)}
                   </Typography>
                 </Box>
@@ -104,7 +104,7 @@ const Dashboard = () => {
                 <PeopleIcon sx={{ fontSize: 40 }} />
                 <Box>
                   <Typography color="textSecondary" gutterBottom>
-                    Tổng số hành khách
+                    Total Passengers
                   </Typography>
                   <Typography variant="h5">
                     {totalPassengers}
@@ -122,7 +122,7 @@ const Dashboard = () => {
                 <AirplaneTicketIcon sx={{ fontSize: 40 }} />
                 <Box>
                   <Typography color="textSecondary" gutterBottom>
-                    Số lượng đặt vé
+                    Total Bookings
                   </Typography>
                   <Typography variant="h5">
                     {bookings.length}
@@ -137,15 +137,15 @@ const Dashboard = () => {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
-              Thống kê theo tuyến bay
+              Distribution by flight routes
             </Typography>
             <TableContainer>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Tuyến bay</TableCell>
-                    <TableCell align="right">Số lượng</TableCell>
-                    <TableCell align="right">Tỷ lệ</TableCell>
+                    <TableCell>Flight Route</TableCell>
+                    <TableCell align="right">Quantity</TableCell>
+                    <TableCell align="right">Proportion</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -168,7 +168,7 @@ const Dashboard = () => {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
-              Phân bố hạng vé
+              Distribution by ticket class
             </Typography>
             <Stack spacing={2}>
               {Object.entries(classStats).map(([className, count]) => (
@@ -208,18 +208,18 @@ const Dashboard = () => {
         <Grid item xs={12}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
-              Đặt vé gần đây
+              Recent Bookings
             </Typography>
             <TableContainer>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Mã đặt vé</TableCell>
-                    <TableCell>Hành khách</TableCell>
-                    <TableCell>Tuyến bay</TableCell>
-                    <TableCell>Hạng vé</TableCell>
-                    <TableCell align="right">Số người</TableCell>
-                    <TableCell align="right">Tổng tiền</TableCell>
+                    <TableCell>Booking Number</TableCell>
+                    <TableCell>Passenger</TableCell>
+                    <TableCell>Flight Route</TableCell>
+                    <TableCell>Class</TableCell>
+                    <TableCell align="right">Number of people</TableCell>
+                    <TableCell align="right">Total Price</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -231,9 +231,9 @@ const Dashboard = () => {
                       <TableCell>{booking.ticketClass}</TableCell>
                       <TableCell align="right">{booking.totalPeople}</TableCell>
                       <TableCell align="right">
-                        {new Intl.NumberFormat('vi-VN', {
+                        {new Intl.NumberFormat('en-EN', {
                           style: 'currency',
-                          currency: 'VND'
+                          currency: 'USD'
                         }).format(booking.price * booking.totalPeople)}
                       </TableCell>
                     </TableRow>

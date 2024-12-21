@@ -23,6 +23,7 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { AddFlight } from "../components/AddFlight";
 import { getAllFlights, deleteFlight } from "../services/FlightServices";
 import styles from './CSS/Style';
+import { LoadingState } from "../components/LoadingState";
 
 export default function Flight() {
     const [flights, setFlights] = useState([]);
@@ -287,6 +288,7 @@ export default function Flight() {
                     mb: 2,
                     px: 2
                 }}>
+
                     <Button
                         variant="contained"
                         startIcon={<AddIcon />}
@@ -309,78 +311,85 @@ export default function Flight() {
                     ...styles.tableContainer,
                     paddingTop: '20px',
                 }}>
-                    <DataGrid
-                        rows={rows}
-                        columns={columns}
-                        loading={loading.fetching}
-                        initialState={{
-                            pagination: {
-                                paginationModel: {
-                                    pageSize: 10,
-                                }
-                            },
-                        }}
-                        slots={{
-                            toolbar: GridToolbar,
-                            noRowsOverlay: () => (
-                                <div style={styles.noRowsOverlay}>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="100"
-                                        height="100"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        // stroke={blue[500]}
-                                        strokeWidth="1"
-                                        style={{ opacity: 0.5, marginBottom: 16 }}
-                                    >
-                                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                                        <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
-                                    </svg>
-                                    No Flights Available
-                                </div>
-                            )
-                        }}
-                        slotProps={{
-                            toolbar: {
-                                showQuickFilter: true,
-                                quickFilterProps: {
-                                    placeholder: 'Search flights...',
-                                    variant: 'outlined',
-                                    size: 'medium',
-                                    sx: {
-                                        ...styles.searchField,
-                                        flexGrow: 1,
-                                        padding: '0',
-                                        marginRight: '10px',
-                                        maxWidth: '500px',
-                                        '& .MuiSvgIcon-root': {
-                                            fontSize: '1.5rem',
-                                            marginRight: 1.5,
-                                            ...styles.searchIcon,
-                                        },
-                                        '& .MuiButtonBase-root': {
-                                            display: 'none',
-                                        },
+                    {loading.fetching ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
+                            <LoadingState size={60} />
+                        </Box>
+                    ) : (
+                        <DataGrid
+                            rows={rows}
+                            columns={columns}
+                            loading={loading.fetching}
+                            initialState={{
+                                pagination: {
+                                    paginationModel: {
+                                        pageSize: 10,
                                     }
                                 },
-                                sx: {
-                                    padding: '0 20px 15px 15px',
-                                    '& .MuiButtonBase-root': {
-                                        color: '#8DD3BA',
-                                        fontWeight: '500',
+                            }}
+                            slots={{
+                                toolbar: GridToolbar,
+                                noRowsOverlay: () => (
+                                    <div style={styles.noRowsOverlay}>
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="100"
+                                            height="100"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            // stroke={blue[500]}
+                                            strokeWidth="1"
+                                            style={{ opacity: 0.5, marginBottom: 16 }}
+                                        >
+                                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                            <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
+                                        </svg>
+                                        No Flights Available
+                                    </div>
+                                )
+                            }}
+                            slotProps={{
+                                toolbar: {
+                                    showQuickFilter: true,
+                                    quickFilterProps: {
+                                        placeholder: 'Search flights...',
+                                        variant: 'outlined',
+                                        size: 'medium',
+                                        sx: {
+                                            ...styles.searchField,
+                                            flexGrow: 1,
+                                            padding: '0',
+                                            marginRight: '10px',
+                                            maxWidth: '500px',
+                                            '& .MuiSvgIcon-root': {
+                                                fontSize: '1.5rem',
+                                                marginRight: 1.5,
+                                                ...styles.searchIcon,
+                                            },
+                                            '& .MuiButtonBase-root': {
+                                                display: 'none',
+                                            },
+                                        }
                                     },
+                                    sx: {
+                                        padding: '0 20px 15px 15px',
+                                        '& .MuiButtonBase-root': {
+                                            color: '#8DD3BA',
+                                            fontWeight: '500',
+                                        },
+                                    }
                                 }
-                            }
-                        }}
-                        checkboxSelection
-                        disableRowSelectionOnClick
-                        pageSizeOptions={[5, 10, 25]}
-                        sx={{
-                            ...styles.dataGrid,
-                        }}
-                    />
+                            }}
+                            checkboxSelection
+                            disableRowSelectionOnClick
+                            pageSizeOptions={[5, 10, 25]}
+                            sx={{
+                                ...styles.dataGrid,
+                            }}
+                        />
+                    )}
                 </Box>
+
                 <Snackbar
                     open={!!error}
                     autoHideDuration={6000}
